@@ -2,13 +2,13 @@
 
 A powerful text-to-speech command-line tool that extends the traditional `say` command with advanced voice synthesis capabilities using ElevenLabs API. Create custom voice models from your own voice and speak in multiple languages with natural-sounding output.
 
-## Live Demo
+## Live Demo (with Audio)
 
-Here's an example of saym in action:
+Here's a video example of saym in action with audio output:
 
-[📹️ saym usage example](https://i.gyazo.com/319de9dd7df24aa583ea7972ffd50b3b.mp4)
+[📹️ saym usage example (click to play with sound)](https://i.gyazo.com/319de9dd7df24aa583ea7972ffd50b3b.mp4)
 
-This example shows saym reading its own command description using ElevenLabs' high-quality voice synthesis engine.
+This video demonstrates saym reading its own command description using ElevenLabs' high-quality voice synthesis engine. Turn on your audio to hear the synthesized speech!
 
 ## Features
 
