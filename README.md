@@ -6,7 +6,7 @@ A powerful text-to-speech command-line tool that extends the traditional `say` c
 
 Here's an example of saym in action:
 
-[saym usage example](https://i.gyazo.com/b8b46d3b777ec97618d920183a1889fa.mp4)
+[📹️ saym usage example](https://i.gyazo.com/319de9dd7df24aa583ea7972ffd50b3b.mp4)
 
 This example shows saym reading its own command description using ElevenLabs' high-quality voice synthesis engine.
 
