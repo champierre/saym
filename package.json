@@ -26,12 +26,14 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@types/ws": "^8.18.1",
     "axios": "^1.6.0",
     "commander": "^11.0.0",
     "dotenv": "^16.3.1",
     "form-data": "^4.0.0",
     "node-cache": "^5.1.2",
-    "play-sound": "^1.1.6"
+    "play-sound": "^1.1.6",
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "@types/jest": "^29.5.5",

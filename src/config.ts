@@ -33,6 +33,8 @@ export class ConfigManager {
         maxSize: '100MB',
         ttl: 86400,
       },
+      ttsProvider: 'elevenlabs',
+      providers: {},
     };
 
     if (!fs.existsSync(this.configPath)) {
@@ -108,8 +110,17 @@ export class ConfigManager {
   /**
    * Get API key from environment or config
    */
-  getApiKey(): string | undefined {
-    return process.env.ELEVENLABS_API_KEY;
+  getApiKey(provider?: 'elevenlabs' | 'cartesia'): string | undefined {
+    const ttsProvider = provider || this.config.ttsProvider || 'elevenlabs';
+    
+    switch (ttsProvider) {
+      case 'elevenlabs':
+        return process.env.ELEVENLABS_API_KEY || this.config.providers?.elevenlabs?.apiKey;
+      case 'cartesia':
+        return process.env.CARTESIA_API_KEY || this.config.providers?.cartesia?.apiKey;
+      default:
+        return undefined;
+    }
   }
 
   /**

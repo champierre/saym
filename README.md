@@ -1,6 +1,6 @@
 # saym - Say iMproved
 
-A powerful text-to-speech command-line tool that extends the traditional `say` command with advanced voice synthesis capabilities using ElevenLabs API. Create custom voice models from your own voice and speak in multiple languages with natural-sounding output.
+A powerful text-to-speech command-line tool that extends the traditional `say` command with advanced voice synthesis capabilities using ElevenLabs and Cartesia APIs. Create custom voice models from your own voice and speak in multiple languages with natural-sounding output.
 
 ## Live Demo (with Audio)
 
@@ -12,12 +12,13 @@ This video demonstrates saym reading its own command description using ElevenLab
 
 ## Features
 
-- 🎤 **Custom Voice Modeling**: Train and use your own voice model through ElevenLabs
+- 🎤 **Custom Voice Modeling**: Train and use your own voice model through ElevenLabs and Cartesia
 - 🌍 **Multi-language Support**: Speak text in various languages with automatic translation
-- 🎯 **High-Quality Synthesis**: Leverage ElevenLabs' advanced AI voice synthesis
+- 🎯 **High-Quality Synthesis**: Leverage advanced AI voice synthesis from multiple providers
 - 💬 **Simple CLI Interface**: Easy-to-use command-line interface similar to the native `say` command
 - 🔊 **Audio Output Options**: Save to file or play directly through speakers
 - 🎛️ **Voice Customization**: Adjust voice parameters like stability, similarity boost, and style
+- 🔄 **Multiple Providers**: Support for both ElevenLabs and Cartesia TTS APIs
 
 ## Installation
 
@@ -32,8 +33,9 @@ npm install
 # Build the project
 npm run build
 
-# Set up your ElevenLabs API key
-export ELEVENLABS_API_KEY="your-api-key-here"
+# Set up your API keys (at least one is required)
+export ELEVENLABS_API_KEY="your-elevenlabs-api-key"
+export CARTESIA_API_KEY="your-cartesia-api-key"
 ```
 
 ### Running saym
@@ -85,6 +87,9 @@ saym "Hello, world!"
 # Use a specific voice model by ID or name
 saym -v "voice-id-or-name" "This is my custom voice"
 
+# Use Cartesia provider instead of default ElevenLabs
+saym -p cartesia -v "694f9389-aac1-45b6-b726-9d9369183238" "Hello from Cartesia!"
+
 # Read from file
 saym -f input.txt
 
@@ -98,8 +103,11 @@ saym -s "Stream this text as it's being synthesized"
 ### Voice Management
 
 ```bash
-# List all available voices
+# List all available voices (default provider)
 saym voice list
+
+# List voices from a specific provider
+saym voice list -p cartesia
 
 # Create a custom voice model from audio samples
 saym voice create -n "My Voice" -d "Personal voice model" -s sample1.mp3 sample2.wav sample3.m4a
@@ -120,7 +128,11 @@ saym --format wav -o output.wav "Save as WAV file"
 # Configuration management
 saym config show                           # Show current configuration
 saym config set defaultVoice <voice-id>    # Set default voice
+saym config set ttsProvider cartesia       # Set default TTS provider
 saym config reset                          # Reset to defaults
+
+# List supported providers
+saym providers
 ```
 
 ### Creating Your Own Voice Model
@@ -158,41 +170,74 @@ Create a `.saymrc` file in your home directory for default settings:
   "defaultVoice": "your-voice-id",
   "defaultLanguage": "en",
   "autoTranslate": true,
-  "outputFormat": "mp3"
+  "outputFormat": "mp3",
+  "ttsProvider": "elevenlabs",
+  "providers": {
+    "elevenlabs": {
+      "apiKey": "optional-if-not-in-env"
+    },
+    "cartesia": {
+      "apiKey": "optional-if-not-in-env"
+    }
+  }
 }
 ```
 
 ## Requirements
 
 - Node.js 18+ or Deno
-- ElevenLabs API account and API key
+- At least one TTS provider API key:
+  - ElevenLabs API account and API key, OR
+  - Cartesia API account and API key
 - FFmpeg (for audio format conversions)
 
 ## API Key Setup
 
-### 1. Create an ElevenLabs Account
+You can use either ElevenLabs or Cartesia (or both). Here's how to set up each:
+
+### ElevenLabs Setup
+
+#### 1. Create an ElevenLabs Account
 
 1. Visit [ElevenLabs](https://elevenlabs.io/) and click "Sign Up"
 2. Create an account using email or Google/GitHub authentication
 3. Choose a subscription plan (Free tier available with limited usage)
 
-### 2. Generate API Key
+#### 2. Generate ElevenLabs API Key
 
 1. Log in to your ElevenLabs dashboard
 2. Click on your profile icon (top right) → "Profile + API Key"
 3. In the API section, click "Generate API Key"
 4. Copy the generated API key immediately (it won't be shown again)
 
-### 3. Verify API Key
+### Cartesia Setup
+
+#### 1. Create a Cartesia Account
+
+1. Visit [Cartesia](https://cartesia.ai/) and sign up for access
+2. Create an account and get API access
+3. Cartesia offers ultra-low latency TTS with their Sonic models
+
+#### 2. Generate Cartesia API Key
+
+1. Log in to your Cartesia dashboard
+2. Navigate to API keys section
+3. Generate and copy your API key
+
+### 3. Verify API Keys
 
 Test your API key setup:
 
 ```bash
-# Check if environment variable is set
+# Check if environment variables are set
 echo $ELEVENLABS_API_KEY
+echo $CARTESIA_API_KEY
 
-# Test with saym
+# Test with saym (ElevenLabs)
 saym voice list
+
+# Test with saym (Cartesia)
+saym voice list -p cartesia
 ```
 
 ## License

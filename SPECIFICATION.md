@@ -2,7 +2,7 @@
 
 ## Overview
 
-saym (Say iMproved) is a command-line text-to-speech application that enhances the traditional Unix `say` command by integrating ElevenLabs' advanced voice synthesis API. It enables users to create custom voice models, translate text, and generate high-quality speech in multiple languages.
+saym (Say iMproved) is a command-line text-to-speech application that enhances the traditional Unix `say` command by integrating advanced voice synthesis APIs from multiple providers (ElevenLabs and Cartesia). It enables users to create custom voice models, translate text, and generate high-quality speech in multiple languages.
 
 ## Architecture
 
@@ -13,8 +13,10 @@ saym (Say iMproved) is a command-line text-to-speech application that enhances t
    - Configuration management
    - User interaction handling
 
-2. **Voice Engine** (`src/voice-engine.ts`)
+2. **Voice Engine** (`src/providers/`)
+   - Provider abstraction layer
    - ElevenLabs API integration
+   - Cartesia API integration
    - Voice synthesis orchestration
    - Audio stream management
 
@@ -35,6 +37,14 @@ saym (Say iMproved) is a command-line text-to-speech application that enhances t
 
 ## API Integration
 
+### Provider Abstraction
+
+The application uses a provider abstraction layer to support multiple TTS services:
+
+- **TTSProvider Interface**: Common interface for all providers
+- **ProviderFactory**: Creates and manages provider instances
+- **Provider-specific implementations**: ElevenLabs and Cartesia
+
 ### ElevenLabs API
 
 #### Endpoints Used
@@ -47,6 +57,19 @@ saym (Say iMproved) is a command-line text-to-speech application that enhances t
    - `GET /v1/voices`
    - `POST /v1/voices/add`
    - `DELETE /v1/voices/{voice_id}`
+
+### Cartesia API
+
+#### Endpoints Used
+
+1. **Text-to-Speech**
+   - `POST /tts/bytes` - Batch TTS generation
+   - `wss://api.cartesia.ai/tts/websocket` - WebSocket streaming
+
+2. **Features**
+   - Ultra-low latency (40-90ms)
+   - Multiple language support
+   - Voice cloning capabilities
 
 3. **Voice Cloning**
    - `POST /v1/voice-generation/create-voice`

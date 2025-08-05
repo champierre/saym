@@ -3,11 +3,10 @@
 import { Command } from 'commander';
 import fs from 'fs';
 import dotenv from 'dotenv';
-import { VoiceEngine } from './voice-engine';
-import { VoiceManager } from './voice-manager';
 import { AudioPlayer } from './audio';
 import { ConfigManager } from './config';
-import { VoiceSettings } from './types';
+import { TTSVoiceSettings } from './providers/tts-provider';
+import { ProviderFactory, ProviderType } from './providers/provider-factory';
 
 dotenv.config();
 
@@ -25,6 +24,7 @@ program
   .option('-v, --voice <voice>', 'Voice ID or name')
   .option('-f, --file <file>', 'Input text file')
   .option('-o, --output <file>', 'Output audio file')
+  .option('-p, --provider <provider>', 'TTS provider (elevenlabs, cartesia)', 'elevenlabs')
   .option('--format <format>', 'Audio format (mp3, wav, ogg)', 'mp3')
   .option('--stability <value>', 'Voice stability (0.0-1.0)', parseFloat, 0.5)
   .option('--similarity <value>', 'Similarity boost (0.0-1.0)', parseFloat, 0.75)
@@ -33,13 +33,18 @@ program
   .option('-s, --stream', 'Stream audio playback', false)
   .action(async (text, options) => {
     try {
-      const apiKey = config.getApiKey();
+      // Determine provider
+      const providerType = (options.provider || config.get('ttsProvider') || 'elevenlabs') as ProviderType;
+      
+      // Get API key for the selected provider
+      const apiKey = config.getApiKey(providerType);
       if (!apiKey) {
-        console.error('Error: ELEVENLABS_API_KEY environment variable is not set');
+        console.error(`Error: API key for ${providerType} is not set. Set ${providerType.toUpperCase()}_API_KEY environment variable.`);
         process.exit(1);
       }
 
-      const engine = new VoiceEngine(apiKey);
+      // Create provider instance
+      const provider = await ProviderFactory.createProvider(providerType, { apiKey });
       const audioPlayer = new AudioPlayer();
 
       // Get text input
@@ -54,18 +59,24 @@ program
       // Get voice ID
       let voiceId = options.voice || config.get('defaultVoice');
       if (!voiceId) {
-        console.error('Error: No voice specified. Use --voice option or set default voice.');
+        // If no voice specified, list available voices and suggest using one
+        const voices = await provider.listVoices();
+        if (voices.length > 0) {
+          console.error(`Error: No voice specified. Available voices for ${providerType}:`);
+          voices.forEach(v => console.error(`  - ${v.id}: ${v.name}`));
+          console.error('\nUse --voice option or set default voice in config.');
+        } else {
+          console.error('Error: No voice specified and no voices available.');
+        }
         process.exit(1);
       }
 
       // If voice looks like a name instead of ID, try to find it
-      // Voice IDs are typically long alphanumeric strings, names are shorter and readable
-      if (voiceId.length < 15 && !/^[A-Za-z0-9]{15,}$/.test(voiceId)) {
-        const voiceManager = new VoiceManager(apiKey);
-        const voices = await voiceManager.listVoices();
+      if (voiceId.length < 15 && !/^[A-Za-z0-9-]{15,}$/.test(voiceId)) {
+        const voices = await provider.listVoices();
         const voice = voices.find(v => v.name.toLowerCase() === voiceId.toLowerCase());
         if (voice) {
-          voiceId = voice.voice_id;
+          voiceId = voice.id;
         } else {
           console.error(`Error: Voice "${voiceId}" not found.`);
           process.exit(1);
@@ -73,31 +84,40 @@ program
       }
 
       // Prepare voice settings
-      const voiceSettings: VoiceSettings = {
+      const voiceSettings: TTSVoiceSettings = {
         stability: options.stability,
-        similarity_boost: options.similarity,
+        similarity: options.similarity,
         style: options.style,
-        use_speaker_boost: options.speakerBoost,
+        speakerBoost: options.speakerBoost,
       };
 
-      console.log(`Speaking with voice: ${voiceId}`);
+      console.log(`Speaking with ${providerType} voice: ${voiceId}`);
 
       if (options.stream) {
         // Stream mode
-        const stream = await engine.textToSpeechStream(inputText, voiceId, { voiceSettings });
+        const stream = await provider.textToSpeechStream(inputText, voiceId, { 
+          voiceSettings, 
+          outputFormat: options.format 
+        });
         
         if (options.output) {
-          await engine.saveStreamToFile(stream, options.output);
+          // Save stream to file
+          const { pipeline } = await import('stream/promises');
+          const writeStream = fs.createWriteStream(options.output);
+          await pipeline(stream, writeStream);
           console.log(`Audio saved to: ${options.output}`);
         } else {
           await audioPlayer.playStream(stream, options.format);
         }
       } else {
         // Buffer mode
-        const audio = await engine.textToSpeech(inputText, voiceId, { voiceSettings });
+        const audio = await provider.textToSpeech(inputText, voiceId, { 
+          voiceSettings, 
+          outputFormat: options.format 
+        });
         
         if (options.output) {
-          await engine.saveAudioToFile(audio, options.output);
+          fs.writeFileSync(options.output, audio);
           console.log(`Audio saved to: ${options.output}`);
         } else {
           await audioPlayer.playAudio(audio, options.format);
@@ -118,25 +138,30 @@ const voice = program.command('voice').description('Voice management commands');
 voice
   .command('list')
   .description('List all available voices')
-  .action(async () => {
+  .option('-p, --provider <provider>', 'TTS provider (elevenlabs, cartesia)')
+  .action(async (options) => {
     try {
-      const apiKey = config.getApiKey();
+      const providerType = (options.provider || config.get('ttsProvider') || 'elevenlabs') as ProviderType;
+      const apiKey = config.getApiKey(providerType);
+      
       if (!apiKey) {
-        console.error('Error: ELEVENLABS_API_KEY environment variable is not set');
+        console.error(`Error: API key for ${providerType} is not set. Set ${providerType.toUpperCase()}_API_KEY environment variable.`);
         process.exit(1);
       }
 
-      const voiceManager = new VoiceManager(apiKey);
-      const voices = await voiceManager.listVoices();
+      const provider = await ProviderFactory.createProvider(providerType, { apiKey });
+      const voices = await provider.listVoices();
 
-      console.log('Available voices:');
+      console.log(`Available voices for ${providerType}:`);
       console.log('─'.repeat(80));
       
       voices.forEach(voice => {
-        console.log(`ID: ${voice.voice_id}`);
+        console.log(`ID: ${voice.id}`);
         console.log(`Name: ${voice.name}`);
-        if (voice.category) console.log(`Category: ${voice.category}`);
         if (voice.description) console.log(`Description: ${voice.description}`);
+        if (voice.languages && voice.languages.length > 0) {
+          console.log(`Languages: ${voice.languages.join(', ')}`);
+        }
         if (voice.labels && Object.keys(voice.labels).length > 0) {
           console.log(`Labels: ${JSON.stringify(voice.labels)}`);
         }
@@ -148,48 +173,57 @@ voice
     }
   });
 
-// Create custom voice
+// Create voice (only for providers that support it)
 voice
   .command('create')
   .description('Create a custom voice model from audio samples')
   .requiredOption('-n, --name <name>', 'Voice name')
   .option('-d, --description <description>', 'Voice description')
-  .option('-s, --samples <files...>', 'Audio sample files (mp3, wav, m4a, ogg, flac)')
-  .option('-l, --labels <labels>', 'Voice labels as JSON string')
+  .option('-s, --samples <files...>', 'Audio sample files')
+  .option('-p, --provider <provider>', 'TTS provider (elevenlabs, cartesia)')
   .action(async (options) => {
     try {
-      const apiKey = config.getApiKey();
+      const providerType = (options.provider || config.get('ttsProvider') || 'elevenlabs') as ProviderType;
+      const apiKey = config.getApiKey(providerType);
+      
       if (!apiKey) {
-        console.error('Error: ELEVENLABS_API_KEY environment variable is not set');
+        console.error(`Error: API key for ${providerType} is not set.`);
+        process.exit(1);
+      }
+
+      const provider = await ProviderFactory.createProvider(providerType, { apiKey });
+      
+      if (!provider.supportsVoiceCloning()) {
+        console.error(`Error: ${providerType} does not support voice cloning.`);
+        process.exit(1);
+      }
+
+      if (!provider.createVoice) {
+        console.error(`Error: Voice creation not implemented for ${providerType}.`);
         process.exit(1);
       }
 
       if (!options.samples || options.samples.length === 0) {
-        console.error('Error: At least one audio sample is required');
+        console.error('Error: At least one audio sample file is required.');
         process.exit(1);
       }
 
-      const voiceManager = new VoiceManager(apiKey);
-      
-      console.log('Creating custom voice model...');
-      console.log(`Name: ${options.name}`);
-      console.log(`Samples: ${options.samples.length} files`);
+      // Read audio samples
+      const samples: Buffer[] = [];
+      for (const filePath of options.samples) {
+        if (!fs.existsSync(filePath)) {
+          console.error(`Error: Audio file not found: ${filePath}`);
+          process.exit(1);
+        }
+        samples.push(fs.readFileSync(filePath));
+      }
 
-      const labels = options.labels ? JSON.parse(options.labels) : undefined;
+      console.log(`Creating voice "${options.name}" with ${samples.length} samples...`);
+      const voiceId = await provider.createVoice(options.name, samples, options.description);
       
-      const voiceId = await voiceManager.createVoiceFromFiles(
-        options.name,
-        options.samples,
-        options.description,
-        labels
-      );
-
-      console.log('Voice created successfully!');
+      console.log(`Voice created successfully!`);
       console.log(`Voice ID: ${voiceId}`);
-      console.log(`\nYou can now use this voice with: saym --voice ${voiceId} "Your text"`);
-      
-      // Ask if user wants to set as default
-      console.log('\nTip: Set as default voice with: saym config set defaultVoice ' + voiceId);
+      console.log(`You can now use this voice with: saym -v ${voiceId} "Your text"`);
     } catch (error) {
       console.error('Error:', error);
       process.exit(1);
@@ -200,20 +234,26 @@ voice
 voice
   .command('delete <voiceId>')
   .description('Delete a custom voice')
-  .action(async (voiceId) => {
+  .option('-p, --provider <provider>', 'TTS provider (elevenlabs, cartesia)')
+  .action(async (voiceId, options) => {
     try {
-      const apiKey = config.getApiKey();
+      const providerType = (options.provider || config.get('ttsProvider') || 'elevenlabs') as ProviderType;
+      const apiKey = config.getApiKey(providerType);
+      
       if (!apiKey) {
-        console.error('Error: ELEVENLABS_API_KEY environment variable is not set');
+        console.error(`Error: API key for ${providerType} is not set.`);
         process.exit(1);
       }
 
-      const voiceManager = new VoiceManager(apiKey);
+      const provider = await ProviderFactory.createProvider(providerType, { apiKey });
       
-      console.log(`Deleting voice: ${voiceId}`);
-      await voiceManager.deleteVoice(voiceId);
-      
-      console.log('Voice deleted successfully!');
+      if (!provider.deleteVoice) {
+        console.error(`Error: Voice deletion not supported for ${providerType}.`);
+        process.exit(1);
+      }
+
+      await provider.deleteVoice(voiceId);
+      console.log(`Voice ${voiceId} deleted successfully.`);
     } catch (error) {
       console.error('Error:', error);
       process.exit(1);
@@ -221,9 +261,9 @@ voice
   });
 
 // Configuration commands
-const configCmd = program.command('config').description('Configuration management');
+const configCommand = program.command('config').description('Configuration management');
 
-configCmd
+configCommand
   .command('show')
   .description('Show current configuration')
   .action(() => {
@@ -232,38 +272,44 @@ configCmd
     console.log(JSON.stringify(allConfig, null, 2));
   });
 
-configCmd
+configCommand
   .command('set <key> <value>')
   .description('Set configuration value')
   .action((key, value) => {
     try {
-      // Parse value if it's JSON
-      let parsedValue: any = value;
-      if (value.startsWith('{') || value.startsWith('[')) {
-        parsedValue = JSON.parse(value);
-      } else if (value === 'true') {
-        parsedValue = true;
-      } else if (value === 'false') {
-        parsedValue = false;
-      } else if (!isNaN(Number(value))) {
-        parsedValue = Number(value);
+      // Handle special cases for nested properties
+      if (key === 'ttsProvider' && !['elevenlabs', 'cartesia'].includes(value)) {
+        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia');
+        process.exit(1);
       }
-
-      config.set(key as any, parsedValue);
-      console.log(`Set ${key} = ${JSON.stringify(parsedValue)}`);
+      
+      config.set(key as any, value);
+      console.log(`Configuration updated: ${key} = ${value}`);
     } catch (error) {
-      console.error('Error setting configuration:', error);
+      console.error('Error:', error);
       process.exit(1);
     }
   });
 
-configCmd
+configCommand
   .command('reset')
   .description('Reset configuration to defaults')
   .action(() => {
     config.reset();
-    console.log('Configuration reset to defaults');
+    console.log('Configuration reset to defaults.');
   });
 
-// Parse command line arguments
-program.parse(process.argv);
+// Provider info command
+program
+  .command('providers')
+  .description('List supported TTS providers')
+  .action(() => {
+    const providers = ProviderFactory.getSupportedProviders();
+    console.log('Supported TTS providers:');
+    providers.forEach(p => {
+      const current = config.get('ttsProvider') === p ? ' (current)' : '';
+      console.log(`  - ${p}${current}`);
+    });
+  });
+
+program.parse();

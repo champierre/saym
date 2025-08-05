@@ -1,6 +1,6 @@
 # saym - Say iMproved
 
-従来の `say` コマンドを拡張し、ElevenLabs APIを使用した高度な音声合成機能を提供する強力なテキスト読み上げコマンドラインツールです。自分の声から音声モデルを作成し、自然な音声で複数の言語を話すことができます。
+従来の `say` コマンドを拡張し、ElevenLabsとCartesia APIを使用した高度な音声合成機能を提供する強力なテキスト読み上げコマンドラインツールです。自分の声から音声モデルを作成し、自然な音声で複数の言語を話すことができます。
 
 ## 実際の使用例（音声付き）
 
@@ -12,12 +12,13 @@
 
 ## 機能
 
-- 🎤 **カスタム音声モデリング**: ElevenLabsを通じて自分の音声モデルを訓練・使用
+- 🎤 **カスタム音声モデリング**: ElevenLabsとCartesiaを通じて自分の音声モデルを訓練・使用
 - 🌍 **多言語サポート**: 自動翻訳により様々な言語でテキストを読み上げ
-- 🎯 **高品質合成**: ElevenLabsの高度なAI音声合成を活用
+- 🎯 **高品質合成**: 複数のプロバイダーの高度なAI音声合成を活用
 - 💬 **シンプルなCLIインターフェース**: ネイティブの `say` コマンドに似た使いやすいコマンドラインインターフェース
 - 🔊 **音声出力オプション**: ファイルに保存またはスピーカーから直接再生
 - 🎛️ **音声カスタマイズ**: 安定性、類似性ブースト、スタイルなどの音声パラメータを調整
+- 🔄 **複数プロバイダー**: ElevenLabsとCartesia TTS APIの両方をサポート
 
 ## インストール
 
@@ -32,8 +33,9 @@ npm install
 # プロジェクトをビルド
 npm run build
 
-# ElevenLabs APIキーを設定
-export ELEVENLABS_API_KEY="your-api-key-here"
+# APIキーを設定（少なくとも1つは必要）
+export ELEVENLABS_API_KEY="your-elevenlabs-api-key"
+export CARTESIA_API_KEY="your-cartesia-api-key"
 ```
 
 ### saym の実行方法
@@ -85,6 +87,9 @@ saym "Hello, world!"
 # 音声IDまたは名前で特定の音声モデルを使用
 saym -v "voice-id-or-name" "これは私のカスタム音声です"
 
+# デフォルトのElevenLabsの代わりにCartesiaプロバイダーを使用
+saym -p cartesia -v "694f9389-aac1-45b6-b726-9d9369183238" "Cartesiaからこんにちは！"
+
 # ファイルから読み込み
 saym -f input.txt
 
@@ -98,8 +103,11 @@ saym -s "合成中にこのテキストをストリーミング"
 ### 音声管理
 
 ```bash
-# 利用可能な音声をすべて表示
+# 利用可能な音声をすべて表示（デフォルトプロバイダー）
 saym voice list
+
+# 特定のプロバイダーから音声を表示
+saym voice list -p cartesia
 
 # 音声サンプルからカスタム音声モデルを作成
 saym voice create -n "私の声" -d "個人用音声モデル" -s sample1.mp3 sample2.wav sample3.m4a
@@ -120,7 +128,11 @@ saym --format wav -o output.wav "WAVファイルとして保存"
 # 設定管理
 saym config show                           # 現在の設定を表示
 saym config set defaultVoice <voice-id>    # デフォルト音声を設定
+saym config set ttsProvider cartesia       # デフォルトTTSプロバイダーを設定
 saym config reset                          # デフォルトにリセット
+
+# サポートされているプロバイダーを表示
+saym providers
 ```
 
 ### 自分の音声モデルを作成
@@ -158,30 +170,59 @@ saym config reset                          # デフォルトにリセット
   "defaultVoice": "your-voice-id",
   "defaultLanguage": "ja",
   "autoTranslate": true,
-  "outputFormat": "mp3"
+  "outputFormat": "mp3",
+  "ttsProvider": "elevenlabs",
+  "providers": {
+    "elevenlabs": {
+      "apiKey": "環境変数にない場合はオプション"
+    },
+    "cartesia": {
+      "apiKey": "環境変数にない場合はオプション"
+    }
+  }
 }
 ```
 
 ## 必要要件
 
 - Node.js 18+ または Deno
-- ElevenLabs APIアカウントとAPIキー
+- 少なくとも1つのTTSプロバイダーのAPIキー：
+  - ElevenLabs APIアカウントとAPIキー、または
+  - Cartesia APIアカウントとAPIキー
 - FFmpeg（音声形式変換用）
 
 ## APIキーのセットアップ
 
-### 1. ElevenLabsアカウントを作成
+ElevenLabsまたはCartesia（または両方）を使用できます。それぞれの設定方法は次のとおりです：
+
+### ElevenLabsセットアップ
+
+#### 1. ElevenLabsアカウントを作成
 
 1. [ElevenLabs](https://elevenlabs.io/)にアクセスし、「Sign Up」をクリック
 2. メールまたはGoogle/GitHub認証でアカウントを作成
 3. サブスクリプションプランを選択（無料プランあり、利用制限付き）
 
-### 2. APIキーを生成
+#### 2. ElevenLabs APIキーを生成
 
 1. ElevenLabsダッシュボードにログイン
 2. プロフィールアイコン（右上）→「Profile + API Key」をクリック
 3. APIセクションで「Generate API Key」をクリック
 4. 生成されたAPIキーを即座にコピー（再度表示されません）
+
+### Cartesiaセットアップ
+
+#### 1. Cartesiaアカウントを作成
+
+1. [Cartesia](https://cartesia.ai/)にアクセスしてアクセス登録
+2. アカウントを作成してAPIアクセスを取得
+3. Cartesiaは超低遅延TTSをSonicモデルで提供
+
+#### 2. Cartesia APIキーを生成
+
+1. Cartesiaダッシュボードにログイン
+2. APIキーセクションに移動
+3. APIキーを生成してコピー
 
 ### 3. APIキーの確認
 
@@ -190,9 +231,13 @@ APIキーの設定をテスト：
 ```bash
 # 環境変数が設定されているか確認
 echo $ELEVENLABS_API_KEY
+echo $CARTESIA_API_KEY
 
-# saym でテスト
+# saym でテスト（ElevenLabs）
 saym voice list
+
+# saym でテスト（Cartesia）
+saym voice list -p cartesia
 ```
 
 ## ライセンス

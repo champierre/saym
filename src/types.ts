@@ -72,6 +72,15 @@ export interface Config {
     maxSize: string;
     ttl: number;
   };
+  ttsProvider?: 'elevenlabs' | 'cartesia';
+  providers?: {
+    elevenlabs?: {
+      apiKey?: string;
+    };
+    cartesia?: {
+      apiKey?: string;
+    };
+  };
 }
 
 export class VoiceEngineError extends Error {
