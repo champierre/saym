@@ -6,7 +6,7 @@
 
 以下は、saymを使って日本語テキストを読み上げる実際の例です：
 
-![saym使用例](https://gyazo.com/b8b46d3b777ec97618d920183a1889fa)
+[saym使用例]([https://gyazo.com/b8b46d3b777ec97618d920183a1889fa](https://i.gyazo.com/b8b46d3b777ec97618d920183a1889fa.mp4))
 
 この例では、saymコマンドの説明文をElevenLabsの高品質な音声合成エンジンを使って読み上げています。
 
