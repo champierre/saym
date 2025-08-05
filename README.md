@@ -2,6 +2,14 @@
 
 A powerful text-to-speech command-line tool that extends the traditional `say` command with advanced voice synthesis capabilities using ElevenLabs API. Create custom voice models from your own voice and speak in multiple languages with natural-sounding output.
 
+## Live Demo
+
+Here's an example of saym in action:
+
+![saym usage example](https://gyazo.com/b8b46d3b777ec97618d920183a1889fa)
+
+This example shows saym reading its own command description using ElevenLabs' high-quality voice synthesis engine.
+
 ## Features
 
 - 🎤 **Custom Voice Modeling**: Train and use your own voice model through ElevenLabs
@@ -175,49 +183,7 @@ Create a `.saymrc` file in your home directory for default settings:
 3. In the API section, click "Generate API Key"
 4. Copy the generated API key immediately (it won't be shown again)
 
-### 3. API Key Configuration
-
-#### API Key Management
-
-ElevenLabs provides the following features for API keys:
-
-- **Multiple API Keys**: You can generate multiple API keys for different environments
-- **Key Regeneration**: Regenerate keys if compromised
-- **Usage Monitoring**: Track API usage per key in the dashboard
-
-#### Rate Limits by Subscription Tier
-
-- **Free tier**: ~10,000 characters/month
-- **Starter**: ~30,000 characters/month  
-- **Creator**: ~100,000 characters/month
-- **Pro**: ~500,000 characters/month
-
-Note: Rate limits are applied at the account level, not per API key.
-
-#### Security Best Practices
-
-1. **Never commit API keys to version control**
-   ```bash
-   # Add to .gitignore
-   echo ".env" >> .gitignore
-   ```
-
-2. **Use environment variables**
-   ```bash
-   # Option 1: Export in shell
-   export ELEVENLABS_API_KEY="your-api-key-here"
-   
-   # Option 2: Use .env file (recommended)
-   echo 'ELEVENLABS_API_KEY="your-api-key-here"' > .env
-   ```
-
-3. **For production deployment**
-   - Use secret management services (AWS Secrets Manager, etc.)
-   - Use separate API keys for different environments
-   - Rotate keys regularly
-   - Monitor usage in ElevenLabs dashboard
-
-### 4. Verify API Key
+### 3. Verify API Key
 
 Test your API key setup:
 
@@ -228,21 +194,6 @@ echo $ELEVENLABS_API_KEY
 # Test with saym
 saym voice list
 ```
-
-### 5. Subscription Tiers and Limits
-
-| Tier | Monthly Characters | Custom Voices | API Access |
-|------|-------------------|---------------|------------|
-| Free | 10,000 | 3 | ✓ |
-| Starter | 30,000 | 10 | ✓ |
-| Creator | 100,000 | 30 | ✓ |
-| Pro | 500,000 | 160 | ✓ |
-
-**Note**: Voice cloning (custom voice creation) requires at least the Starter tier.
-
-## Contributing
-
-Contributions are welcome! Please read our contributing guidelines and submit pull requests to our repository.
 
 ## License
 
