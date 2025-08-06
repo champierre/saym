@@ -85,6 +85,9 @@ saym "Hello, world!"
 # 音声IDまたは名前で特定の音声モデルを使用
 saym -v "voice-id-or-name" "これは私のカスタム音声です"
 
+# 正確な発音のために言語を指定（日本語などの非英語に重要）
+saym -v "voice-id" -l ja "今日は良い天気ですね"
+
 # デフォルトのElevenLabsの代わりにCartesiaプロバイダーを使用
 saym -p cartesia -v "694f9389-aac1-45b6-b726-9d9369183238" "Cartesiaからこんにちは！"
 
@@ -101,14 +104,27 @@ saym -s "合成中にこのテキストをストリーミング"
 ### 音声管理
 
 ```bash
-# 利用可能な音声をすべて表示（デフォルトプロバイダー）
-saym voice list
+# 現在のプロバイダーで利用可能な音声を表示（所有音声のみ）
+saym voices
 
 # 特定のプロバイダーから音声を表示
-saym voice list -p cartesia
+saym voices -p cartesia
 
-# すべての公開音声を表示（Cartesiaの場合）
-saym voice list -p cartesia --all
+# すべての公開音声を表示（既製音声を含む）
+saym voices --all
+```
+
+### 言語サポート
+
+```bash
+# ElevenLabsで日本語（正確な発音のため推奨）
+saym -v "japanese-voice-id" -l ja "今日は良い天気ですね"
+
+# スペイン語で言語を明示的に指定
+saym -v "spanish-voice-id" -l es "Hola, ¿cómo estás?"
+
+# Cartesiaで言語指定（自動検出フォールバック）
+saym -p cartesia -v "voice-id" -l ja "今日は"
 ```
 
 ### 高度なオプション

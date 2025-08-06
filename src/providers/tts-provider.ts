@@ -8,6 +8,7 @@ export interface TTSProviderConfig {
 export interface TTSOptions {
   outputFormat?: string;
   modelId?: string;
+  language?: string;
 }
 
 export interface TTSVoice {

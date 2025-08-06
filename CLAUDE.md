@@ -127,6 +127,12 @@ try {
 4. Add validation if needed
 5. Update tests and documentation
 
+### Language Support Implementation
+- **Language option**: `-l, --language` specifies target language code
+- **ElevenLabs integration**: Automatically selects appropriate model based on language
+- **Cartesia integration**: Passes language parameter (automatic detection fallback)
+- **Model selection**: Non-English languages use `eleven_multilingual_v2` for ElevenLabs
+
 ### Implementing a New TTS Feature
 1. Add the feature to the appropriate provider (e.g., `src/providers/elevenlabs-provider.ts`)
 2. Update the provider API types

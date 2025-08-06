@@ -35,7 +35,8 @@ export class ElevenLabsProvider implements TTSProvider {
         `/text-to-speech/${voiceId}`,
         {
           text,
-          model_id: options?.modelId || 'eleven_monolingual_v1',
+          model_id: options?.modelId || this.getRecommendedModel(options?.language),
+          ...(options?.language && { language: options.language }),
         },
         {
           headers: {
@@ -83,7 +84,8 @@ export class ElevenLabsProvider implements TTSProvider {
         `/text-to-speech/${voiceId}/stream`,
         {
           text,
-          model_id: options?.modelId || 'eleven_monolingual_v1',
+          model_id: options?.modelId || this.getRecommendedModel(options?.language),
+          ...(options?.language && { language: options.language }),
         },
         {
           headers: {
@@ -154,6 +156,14 @@ export class ElevenLabsProvider implements TTSProvider {
 
   getSupportedFormats(): string[] {
     return ['mp3_44100_128', 'mp3_44100_64', 'mp3_44100_32', 'mp3_44100_16', 'pcm_16000', 'pcm_22050', 'pcm_24000', 'pcm_44100'];
+  }
+
+  private getRecommendedModel(language?: string): string {
+    // For non-English languages, use multilingual model
+    if (language && language !== 'en') {
+      return 'eleven_multilingual_v2';
+    }
+    return 'eleven_monolingual_v1';
   }
 
   async validateConnection(): Promise<boolean> {

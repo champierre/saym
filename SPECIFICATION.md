@@ -106,15 +106,37 @@ saym [options] -f <file>
 | Option | Short | Description | Default |
 |--------|-------|-------------|---------|
 | `--voice` | `-v` | Voice ID or name | User's default voice |
-| `--language` | `-l` | Target language code | `en` |
+| `--language` | `-l` | Target language code (ja, en, es, etc.) | `en` |
 | `--output` | `-o` | Output file path | None (play audio) |
 | `--format` | | Audio format (mp3, wav, ogg) | `mp3` |
-| `--stability` | | Voice stability (0.0-1.0) | `0.5` |
-| `--similarity` | | Similarity boost (0.0-1.0) | `0.75` |
-| `--style` | | Style exaggeration (0.0-1.0) | `0.0` |
-| `--speaker-boost` | | Enable speaker boost | `true` |
+| `--provider` | `-p` | TTS provider (elevenlabs, cartesia) | User's default |
 | `--stream` | `-s` | Stream audio playback | `false` |
-| `--config` | `-c` | Config file path | `~/.saymrc` |
+| `--file` | `-f` | Input text file | None |
+
+### Language Support
+
+The `--language` (`-l`) option specifies the target language for text-to-speech synthesis:
+
+#### ElevenLabs Provider
+- **Full support**: Language parameter directly affects voice model selection and pronunciation
+- **Automatic model selection**: Non-English languages automatically use `eleven_multilingual_v2` model
+- **Common codes**: `ja` (Japanese), `en` (English), `es` (Spanish), `fr` (French), `de` (German)
+- **Usage**: Essential for accurate pronunciation of non-English text
+
+```bash
+# Japanese text with correct pronunciation
+saym "今日は" -v "voice-id" -l ja
+```
+
+#### Cartesia Provider
+- **Automatic detection**: Cartesia automatically detects language from input text
+- **Optional parameter**: Language code is sent to API but not required
+- **Fallback behavior**: Works without explicit language specification
+
+```bash
+# Language detection works automatically
+saym "今日は" -p cartesia -v "voice-id" -l ja
+```
 
 ### Environment Variables
 

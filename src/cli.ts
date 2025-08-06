@@ -24,6 +24,7 @@ program
   .option('-f, --file <file>', 'Input text file')
   .option('-o, --output <file>', 'Output audio file')
   .option('-p, --provider <provider>', 'TTS provider (elevenlabs, cartesia)')
+  .option('-l, --language <language>', 'Language code (e.g., ja, en, es)', 'en')
   .option('--format <format>', 'Audio format (mp3, wav, ogg)', 'mp3')
   .option('-s, --stream', 'Stream audio playback', false)
   .action(async (text, options) => {
@@ -83,7 +84,8 @@ program
       if (options.stream) {
         // Stream mode
         const stream = await provider.textToSpeechStream(inputText, voiceId, { 
-          outputFormat: options.format 
+          outputFormat: options.format,
+          language: options.language
         });
         
         if (options.output) {
@@ -98,7 +100,8 @@ program
       } else {
         // Buffer mode
         const audio = await provider.textToSpeech(inputText, voiceId, { 
-          outputFormat: options.format 
+          outputFormat: options.format,
+          language: options.language
         });
         
         if (options.output) {

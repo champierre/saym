@@ -51,6 +51,9 @@ export class CartesiaProvider implements TTSProvider {
           id: voiceId,
         },
         output_format: outputFormat,
+        // Note: Cartesia automatically detects language from text
+        // Language parameter is accepted but not required
+        ...(options?.language && { language: options.language }),
       };
       
       
@@ -100,6 +103,8 @@ export class CartesiaProvider implements TTSProvider {
             sample_rate: 44100,
           },
           context_id: this.generateContextId(),
+          // Note: Cartesia automatically detects language from text
+          ...(options?.language && { language: options.language }),
         };
 
         ws.send(JSON.stringify(request));

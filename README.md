@@ -85,6 +85,9 @@ saym "Hello, world!"
 # Use a specific voice model by ID or name
 saym -v "voice-id-or-name" "This is my custom voice"
 
+# Specify language for accurate pronunciation (important for non-English)
+saym -v "voice-id" -l ja "今日は良い天気ですね"
+
 # Use Cartesia provider instead of default ElevenLabs
 saym -p cartesia -v "694f9389-aac1-45b6-b726-9d9369183238" "Hello from Cartesia!"
 
@@ -101,14 +104,27 @@ saym -s "Stream this text as it's being synthesized"
 ### Voice Management
 
 ```bash
-# List all available voices (default provider)
-saym voice list
+# List available voices for current provider (owned voices only)
+saym voices
 
 # List voices from a specific provider
-saym voice list -p cartesia
+saym voices -p cartesia
 
-# List all public voices (for Cartesia)
-saym voice list -p cartesia --all
+# List all public voices (including pre-made voices)
+saym voices --all
+```
+
+### Language Support
+
+```bash
+# Japanese with ElevenLabs (recommended for accurate pronunciation)
+saym -v "japanese-voice-id" -l ja "今日は良い天気ですね"
+
+# Spanish with explicit language
+saym -v "spanish-voice-id" -l es "Hola, ¿cómo estás?"
+
+# Cartesia with language (auto-detection fallback)
+saym -p cartesia -v "voice-id" -l ja "今日は"
 ```
 
 ### Advanced Options
