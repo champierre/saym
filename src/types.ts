@@ -57,9 +57,11 @@ export interface Config {
   providers?: {
     elevenlabs?: {
       apiKey?: string;
+      defaultVoice?: string;
     };
     cartesia?: {
       apiKey?: string;
+      defaultVoice?: string;
     };
   };
 }

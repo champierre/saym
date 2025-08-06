@@ -120,4 +120,44 @@ export class ConfigManager {
     }
   }
 
+  /**
+   * Get default voice for a specific provider
+   */
+  getDefaultVoice(provider?: 'elevenlabs' | 'cartesia'): string | undefined {
+    const ttsProvider = provider || this.config.ttsProvider || 'elevenlabs';
+    
+    // First check provider-specific default voice
+    switch (ttsProvider) {
+      case 'elevenlabs':
+        if (this.config.providers?.elevenlabs?.defaultVoice) {
+          return this.config.providers.elevenlabs.defaultVoice;
+        }
+        break;
+      case 'cartesia':
+        if (this.config.providers?.cartesia?.defaultVoice) {
+          return this.config.providers.cartesia.defaultVoice;
+        }
+        break;
+    }
+    
+    // Fallback to global default voice
+    return this.config.defaultVoice;
+  }
+
+  /**
+   * Set default voice for a specific provider
+   */
+  setProviderDefaultVoice(provider: 'elevenlabs' | 'cartesia', voiceId: string): void {
+    if (!this.config.providers) {
+      this.config.providers = {};
+    }
+    
+    if (!this.config.providers[provider]) {
+      this.config.providers[provider] = {};
+    }
+    
+    this.config.providers[provider]!.defaultVoice = voiceId;
+    this.saveConfig();
+  }
+
 }

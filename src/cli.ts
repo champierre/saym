@@ -13,22 +13,6 @@ dotenv.config();
 const program = new Command();
 const config = new ConfigManager();
 
-// Helper function to parse provider from command line args due to Commander.js subcommand option issues
-function getProviderFromArgs(): string | undefined {
-  const args = process.argv;
-  const providerIndex = args.indexOf('-p') !== -1 ? args.indexOf('-p') : args.indexOf('--provider');
-  if (providerIndex !== -1 && providerIndex + 1 < args.length) {
-    return args[providerIndex + 1];
-  }
-  return undefined;
-}
-
-// Helper function to check if --all flag is present
-function getAllFlagFromArgs(): boolean {
-  const args = process.argv;
-  return args.includes('-a') || args.includes('--all');
-}
-
 program
   .name('saym')
   .description('Say iMproved - Advanced text-to-speech with custom voice models')
@@ -40,7 +24,7 @@ program
   .option('-v, --voice <voice>', 'Voice ID or name')
   .option('-f, --file <file>', 'Input text file')
   .option('-o, --output <file>', 'Output audio file')
-  .option('-p, --provider <provider>', 'TTS provider (elevenlabs, cartesia)', 'elevenlabs')
+  .option('-p, --provider <provider>', 'TTS provider (elevenlabs, cartesia)')
   .option('--format <format>', 'Audio format (mp3, wav, ogg)', 'mp3')
   .option('--stability <value>', 'Voice stability (0.0-1.0)', parseFloat, 0.5)
   .option('--similarity <value>', 'Similarity boost (0.0-1.0)', parseFloat, 0.75)
@@ -72,8 +56,8 @@ program
         process.exit(1);
       }
 
-      // Get voice ID
-      let voiceId = options.voice || config.get('defaultVoice');
+      // Get voice ID - check provider-specific default first
+      let voiceId = options.voice || config.getDefaultVoice(providerType);
       if (!voiceId) {
         // If no voice specified, list available voices and suggest using one
         const voices = await provider.listVoices();
@@ -147,18 +131,17 @@ program
     }
   });
 
-// Voice management commands
-const voice = program.command('voice').description('Voice management commands');
-
-// List voices
-voice
-  .command('list')
-  .description('List available voices (defaults to owned voices only)')
+// List voices command (top-level for simplicity)
+program
+  .command('voices')
+  .description('List available voices for current provider (defaults to owned voices only)')
   .option('-p, --provider <provider>', 'TTS provider (elevenlabs, cartesia)')
   .option('-a, --all', 'Show all voices including public ones')
-  .action(async () => {
+  .action(async (options) => {
     try {
-      const providerType = (getProviderFromArgs() || config.get('ttsProvider') || 'elevenlabs') as ProviderType;
+      // Use current provider if no provider specified
+      const currentProvider = config.get('ttsProvider') || 'elevenlabs';
+      const providerType = (options.provider || currentProvider) as ProviderType;
       const apiKey = config.getApiKey(providerType);
       
       if (!apiKey) {
@@ -166,15 +149,21 @@ voice
         process.exit(1);
       }
 
+      console.log(`Current provider: ${currentProvider}`);
+      const defaultVoice = config.getDefaultVoice(currentProvider as 'elevenlabs' | 'cartesia');
+      if (defaultVoice) {
+        console.log(`Default voice: ${defaultVoice}`);
+      } else {
+        console.log('No default voice set');
+      }
+      console.log(''); // Empty line for spacing
+
       const provider = await ProviderFactory.createProvider(providerType, { apiKey });
       const allVoices = await provider.listVoices();
       
-      // Check if --all flag is present
-      const showAll = getAllFlagFromArgs();
-      
       // Filter voices based on the --all flag
       let voices = allVoices;
-      if (!showAll) {
+      if (!options.all) {
         // Default to showing only owned/custom voices for both providers
         if (providerType === 'cartesia') {
           voices = allVoices.filter(voice => voice.labels?.is_owner === true);
@@ -184,15 +173,15 @@ voice
         }
       }
 
-      console.log(`Available voices for ${providerType}${showAll ? ' (all)' : ' (owned only)'}:`);
-      if (!showAll) {
+      console.log(`Available voices for ${providerType}${options.all ? ' (all)' : ' (owned only)'}:`);
+      if (!options.all) {
         console.log('Use --all or -a to show all public voices');
       }
       console.log('─'.repeat(80));
       
       if (voices.length === 0) {
         console.log('No voices found.');
-        if (!showAll) {
+        if (!options.all) {
           console.log('Try using --all to see public voices.');
         }
       } else {
@@ -239,8 +228,78 @@ configCommand
         process.exit(1);
       }
       
+      // Handle provider-specific default voice setting
+      if (key.includes('DefaultVoice')) {
+        const match = key.match(/^(elevenlabs|cartesia)DefaultVoice$/);
+        if (match) {
+          const provider = match[1] as 'elevenlabs' | 'cartesia';
+          config.setProviderDefaultVoice(provider, value);
+          console.log(`Configuration updated: ${provider} default voice = ${value}`);
+          return;
+        }
+      }
+      
       config.set(key as any, value);
       console.log(`Configuration updated: ${key} = ${value}`);
+    } catch (error) {
+      console.error('Error:', error);
+      process.exit(1);
+    }
+  });
+
+// Simplified commands for common operations
+configCommand
+  .command('provider <provider>')
+  .description('Set default TTS provider (elevenlabs|cartesia)')
+  .action((provider) => {
+    try {
+      if (!['elevenlabs', 'cartesia'].includes(provider)) {
+        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia');
+        process.exit(1);
+      }
+      
+      config.set('ttsProvider' as any, provider);
+      console.log(`Default provider set to: ${provider}`);
+    } catch (error) {
+      console.error('Error:', error);
+      process.exit(1);
+    }
+  });
+
+configCommand
+  .command('voice <voice-id>')
+  .description('Set default voice for current provider')
+  .option('-p, --provider <provider>', 'Set voice for specific provider (elevenlabs|cartesia)')
+  .action((voiceId, options) => {
+    try {
+      const provider = options.provider || config.get('ttsProvider') || 'elevenlabs';
+      
+      if (options.provider && !['elevenlabs', 'cartesia'].includes(options.provider)) {
+        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia');
+        process.exit(1);
+      }
+      
+      config.setProviderDefaultVoice(provider as 'elevenlabs' | 'cartesia', voiceId);
+      console.log(`Default voice for ${provider} set to: ${voiceId}`);
+    } catch (error) {
+      console.error('Error:', error);
+      process.exit(1);
+    }
+  });
+
+// Keep the original detailed command for advanced users
+configCommand
+  .command('set-default-voice <provider> <voice-id>')
+  .description('Set default voice for a specific provider (elevenlabs|cartesia)')
+  .action((provider, voiceId) => {
+    try {
+      if (!['elevenlabs', 'cartesia'].includes(provider)) {
+        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia');
+        process.exit(1);
+      }
+      
+      config.setProviderDefaultVoice(provider as 'elevenlabs' | 'cartesia', voiceId);
+      console.log(`Default voice for ${provider} set to: ${voiceId}`);
     } catch (error) {
       console.error('Error:', error);
       process.exit(1);
@@ -266,6 +325,68 @@ program
       const current = config.get('ttsProvider') === p ? ' (current)' : '';
       console.log(`  - ${p}${current}`);
     });
+  });
+
+// Quick setup commands (top-level for ease of use)
+program
+  .command('use [provider]')
+  .description('Switch to a provider (elevenlabs|cartesia) or show current provider')
+  .action((provider) => {
+    try {
+      if (!provider) {
+        // Show current provider if no provider specified
+        const currentProvider = config.get('ttsProvider') || 'elevenlabs';
+        console.log(`Current provider: ${currentProvider}`);
+        
+        const defaultVoice = config.getDefaultVoice(currentProvider as 'elevenlabs' | 'cartesia');
+        if (defaultVoice) {
+          console.log(`Default voice for ${currentProvider}: ${defaultVoice}`);
+        } else {
+          console.log(`No default voice set for ${currentProvider}`);
+        }
+        return;
+      }
+      
+      if (!['elevenlabs', 'cartesia'].includes(provider)) {
+        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia');
+        process.exit(1);
+      }
+      
+      config.set('ttsProvider' as any, provider);
+      console.log(`Now using ${provider} as default provider`);
+      
+      // Show current default voice for this provider if any
+      const defaultVoice = config.getDefaultVoice(provider as 'elevenlabs' | 'cartesia');
+      if (defaultVoice) {
+        console.log(`Default voice for ${provider}: ${defaultVoice}`);
+      } else {
+        console.log(`No default voice set for ${provider}. Use 'saym default-voice <voice-id>' to set one.`);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('default-voice <voice-id>')
+  .description('Set default voice for current provider')
+  .option('-p, --provider <provider>', 'Set for specific provider')
+  .action((voiceId, options) => {
+    try {
+      const provider = options.provider || config.get('ttsProvider') || 'elevenlabs';
+      
+      if (options.provider && !['elevenlabs', 'cartesia'].includes(options.provider)) {
+        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia');
+        process.exit(1);
+      }
+      
+      config.setProviderDefaultVoice(provider as 'elevenlabs' | 'cartesia', voiceId);
+      console.log(`✅ Default voice for ${provider} set to: ${voiceId}`);
+    } catch (error) {
+      console.error('Error:', error);
+      process.exit(1);
+    }
   });
 
 program.parse();

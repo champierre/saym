@@ -121,10 +121,16 @@ saym --stability 0.8 --similarity 0.9 --style 0.2 "Fine-tuned voice output"
 saym --format wav -o output.wav "Save as WAV file"
 
 # Configuration management
-saym config show                           # Show current configuration
-saym config set defaultVoice <voice-id>    # Set default voice
-saym config set ttsProvider cartesia       # Set default TTS provider
-saym config reset                          # Reset to defaults
+saym config show                        # Show current configuration
+saym use elevenlabs                     # Switch to ElevenLabs (simple!)
+saym use cartesia                       # Switch to Cartesia (simple!)
+saym default-voice <voice-id>           # Set default voice for current provider
+saym default-voice <voice-id> -p cartesia # Set default voice for specific provider
+
+# Advanced configuration (for power users)
+saym config provider elevenlabs         # Alternative way to set provider
+saym config voice <voice-id>            # Alternative way to set voice
+saym config reset                       # Reset to defaults
 
 # List supported providers
 saym providers
@@ -143,8 +149,8 @@ Once you have created a custom voice through these services, you can use it with
 # Use your custom voice ID
 saym --voice <your-voice-id> "Hello, this is my voice!"
 
-# Or set as default
-saym config set defaultVoice <your-voice-id>
+# Or set as default (see Configuration section below for details)
+saym config set-default-voice elevenlabs <your-voice-id>
 saym "Now using my voice by default!"
 ```
 
@@ -154,20 +160,137 @@ Create a `.saymrc` file in your home directory for default settings:
 
 ```json
 {
-  "defaultVoice": "your-voice-id",
+  "defaultVoice": "global-fallback-voice-id",
   "defaultLanguage": "en",
-  "autoTranslate": true,
   "outputFormat": "mp3",
   "ttsProvider": "elevenlabs",
   "providers": {
     "elevenlabs": {
-      "apiKey": "optional-if-not-in-env"
+      "apiKey": "optional-if-not-in-env",
+      "defaultVoice": "elevenlabs-specific-voice-id"
     },
     "cartesia": {
-      "apiKey": "optional-if-not-in-env"
+      "apiKey": "optional-if-not-in-env",
+      "defaultVoice": "cartesia-specific-voice-id"
     }
   }
 }
+```
+
+### Setting Up Default Provider and Voices
+
+saym uses a priority system for selecting voices:
+1. **Command line voice** (`-v voice-id`) - highest priority
+2. **Provider-specific default voice** - per-provider defaults
+3. **Global default voice** - fallback for all providers
+
+#### Step 1: Choose Your Default TTS Provider
+
+```bash
+# Set ElevenLabs as default (high quality, more expensive)
+saym use elevenlabs
+
+# Or set Cartesia as default (ultra-low latency, cost-effective)
+saym use cartesia
+```
+
+#### Step 2: Find Available Voices
+
+```bash
+# List voices for your default provider
+saym voice list
+
+# List voices for a specific provider
+saym voice list -p elevenlabs
+saym voice list -p cartesia
+
+# List ALL voices (including public ones)
+saym voice list --all
+saym voice list -p cartesia --all
+```
+
+#### Step 3: Set Provider-Specific Default Voices
+
+```bash
+# Set default voice for current provider
+saym default-voice "21m00Tcm4TlvDq8ikWAM"
+
+# Or set for specific provider
+saym default-voice "694f9389-aac1-45b6-b726-9d9369183238" -p cartesia
+saym default-voice "21m00Tcm4TlvDq8ikWAM" -p elevenlabs
+
+# Optional: Set global fallback voice (advanced)
+saym config set defaultVoice "some-voice-id"
+```
+
+#### Step 4: Test Your Configuration
+
+```bash
+# Use default provider and its default voice
+saym "Hello world"
+
+# Use specific provider with its default voice
+saym -p elevenlabs "Hello from ElevenLabs"
+saym -p cartesia "Hello from Cartesia"
+
+# Override with specific voice
+saym -p elevenlabs -v "different-voice-id" "Hello with specific voice"
+```
+
+#### Step 5: View Your Configuration
+
+```bash
+# Show all current settings
+saym config show
+
+# Show supported providers
+saym providers
+```
+
+### Quick Setup Examples
+
+**For ElevenLabs users (super simple!):**
+```bash
+# 1. Switch to ElevenLabs
+saym use elevenlabs
+
+# 2. Find your preferred voice
+saym voice list
+
+# 3. Set it as default
+saym default-voice "your-voice-id"
+
+# 4. Test
+saym "This uses my ElevenLabs default voice"
+```
+
+**For Cartesia users (super simple!):**
+```bash
+# 1. Switch to Cartesia
+saym use cartesia
+
+# 2. Find your preferred voice (owned voices only by default)
+saym voice list
+
+# 3. Set it as default
+saym default-voice "your-voice-id"
+
+# 4. Test
+saym "This uses my Cartesia default voice"
+```
+
+**For users with both providers:**
+```bash
+# Set default provider
+saym use cartesia
+
+# Set default voices for both providers  
+saym default-voice "cartesia-voice-id"              # For current (cartesia)
+saym default-voice "elevenlabs-voice-id" -p elevenlabs  # For elevenlabs
+
+# Now you can easily switch:
+saym "Uses Cartesia (default provider)"
+saym -p elevenlabs "Uses ElevenLabs with its default voice"
 ```
 
 ## Requirements
