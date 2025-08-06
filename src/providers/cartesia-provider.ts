@@ -11,7 +11,8 @@ import {
 
 interface CartesiaOutputFormat {
   container: 'raw' | 'wav' | 'mp3';
-  encoding: 'pcm_s16le' | 'pcm_f32le' | 'pcm_mulaw' | 'pcm_alaw';
+  encoding?: 'pcm_s16le' | 'pcm_f32le' | 'pcm_mulaw' | 'pcm_alaw';
+  bit_rate?: number;
   sample_rate: number;
 }
 
@@ -42,17 +43,20 @@ export class CartesiaProvider implements TTSProvider {
     try {
       const outputFormat = this.parseOutputFormat(options?.outputFormat);
       
+      const requestBody = {
+        transcript: text,
+        model_id: options?.modelId || 'sonic-2',
+        voice: {
+          mode: 'id',
+          id: voiceId,
+        },
+        output_format: outputFormat,
+      };
+      
+      
       const response = await this.client.post(
         '/tts/bytes',
-        {
-          transcript: text,
-          model_id: options?.modelId || 'sonic-2',
-          voice: {
-            mode: 'id',
-            id: voiceId,
-          },
-          output_format: outputFormat,
-        },
+        requestBody,
         {
           responseType: 'arraybuffer',
         }
@@ -61,8 +65,8 @@ export class CartesiaProvider implements TTSProvider {
       return Buffer.from(response.data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        const errorMessage = error.response?.data?.message || error.message;
-        throw new TTSProviderError(this.name, `Text-to-speech failed: ${errorMessage}`);
+        const errorMessage = error.response?.data?.message || error.response?.data || error.message;
+        throw new TTSProviderError(this.name, `Text-to-speech failed: ${error.response?.status} ${errorMessage}`);
       }
       throw error;
     }
@@ -197,7 +201,12 @@ export class CartesiaProvider implements TTSProvider {
     // Parse format string (e.g., "wav", "mp3", "raw")
     switch (format.toLowerCase()) {
       case 'mp3':
-        return { container: 'mp3', encoding: 'pcm_s16le', sample_rate: 44100 };
+        // MP3 uses bit_rate instead of encoding
+        return { 
+          container: 'mp3', 
+          bit_rate: 128000, // 128 kbps
+          sample_rate: 44100 
+        };
       case 'raw':
         return { container: 'raw', encoding: 'pcm_s16le', sample_rate: 44100 };
       case 'wav':

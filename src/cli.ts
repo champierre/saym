@@ -13,6 +13,16 @@ dotenv.config();
 const program = new Command();
 const config = new ConfigManager();
 
+// Helper function to parse provider from command line args due to Commander.js subcommand option issues
+function getProviderFromArgs(): string | undefined {
+  const args = process.argv;
+  const providerIndex = args.indexOf('-p') !== -1 ? args.indexOf('-p') : args.indexOf('--provider');
+  if (providerIndex !== -1 && providerIndex + 1 < args.length) {
+    return args[providerIndex + 1];
+  }
+  return undefined;
+}
+
 program
   .name('saym')
   .description('Say iMproved - Advanced text-to-speech with custom voice models')
@@ -139,9 +149,9 @@ voice
   .command('list')
   .description('List all available voices')
   .option('-p, --provider <provider>', 'TTS provider (elevenlabs, cartesia)')
-  .action(async (options) => {
+  .action(async () => {
     try {
-      const providerType = (options.provider || config.get('ttsProvider') || 'elevenlabs') as ProviderType;
+      const providerType = (getProviderFromArgs() || config.get('ttsProvider') || 'elevenlabs') as ProviderType;
       const apiKey = config.getApiKey(providerType);
       
       if (!apiKey) {
@@ -181,9 +191,9 @@ voice
   .option('-d, --description <description>', 'Voice description')
   .option('-s, --samples <files...>', 'Audio sample files')
   .option('-p, --provider <provider>', 'TTS provider (elevenlabs, cartesia)')
-  .action(async (options) => {
+  .action(async () => {
     try {
-      const providerType = (options.provider || config.get('ttsProvider') || 'elevenlabs') as ProviderType;
+      const providerType = (getProviderFromArgs() || config.get('ttsProvider') || 'elevenlabs') as ProviderType;
       const apiKey = config.getApiKey(providerType);
       
       if (!apiKey) {
@@ -203,23 +213,46 @@ voice
         process.exit(1);
       }
 
-      if (!options.samples || options.samples.length === 0) {
+      // Parse command line arguments for create command options
+      const args = process.argv;
+      const nameIndex = args.indexOf('-n') !== -1 ? args.indexOf('-n') : args.indexOf('--name');
+      const name = nameIndex !== -1 && nameIndex + 1 < args.length ? args[nameIndex + 1] : undefined;
+      
+      const descIndex = args.indexOf('-d') !== -1 ? args.indexOf('-d') : args.indexOf('--description');
+      const description = descIndex !== -1 && descIndex + 1 < args.length ? args[descIndex + 1] : undefined;
+      
+      const samplesIndex = args.indexOf('-s') !== -1 ? args.indexOf('-s') : args.indexOf('--samples');
+      let samples: string[] = [];
+      if (samplesIndex !== -1) {
+        // Collect all arguments after --samples until the next option
+        for (let i = samplesIndex + 1; i < args.length; i++) {
+          if (args[i].startsWith('-')) break;
+          samples.push(args[i]);
+        }
+      }
+
+      if (!name) {
+        console.error('Error: Voice name is required. Use -n or --name option.');
+        process.exit(1);
+      }
+
+      if (!samples || samples.length === 0) {
         console.error('Error: At least one audio sample file is required.');
         process.exit(1);
       }
 
       // Read audio samples
-      const samples: Buffer[] = [];
-      for (const filePath of options.samples) {
+      const sampleBuffers: Buffer[] = [];
+      for (const filePath of samples) {
         if (!fs.existsSync(filePath)) {
           console.error(`Error: Audio file not found: ${filePath}`);
           process.exit(1);
         }
-        samples.push(fs.readFileSync(filePath));
+        sampleBuffers.push(fs.readFileSync(filePath));
       }
 
-      console.log(`Creating voice "${options.name}" with ${samples.length} samples...`);
-      const voiceId = await provider.createVoice(options.name, samples, options.description);
+      console.log(`Creating voice "${name}" with ${sampleBuffers.length} samples...`);
+      const voiceId = await provider.createVoice(name, sampleBuffers, description);
       
       console.log(`Voice created successfully!`);
       console.log(`Voice ID: ${voiceId}`);
@@ -235,9 +268,9 @@ voice
   .command('delete <voiceId>')
   .description('Delete a custom voice')
   .option('-p, --provider <provider>', 'TTS provider (elevenlabs, cartesia)')
-  .action(async (voiceId, options) => {
+  .action(async (voiceId) => {
     try {
-      const providerType = (options.provider || config.get('ttsProvider') || 'elevenlabs') as ProviderType;
+      const providerType = (getProviderFromArgs() || config.get('ttsProvider') || 'elevenlabs') as ProviderType;
       const apiKey = config.getApiKey(providerType);
       
       if (!apiKey) {
