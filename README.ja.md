@@ -1,6 +1,6 @@
 # saym - Say iMproved
 
-従来の `say` コマンドを拡張し、ElevenLabsとCartesia APIを使用した高度な音声合成機能を提供する強力なテキスト読み上げコマンドラインツールです。自分の声から音声モデルを作成し、自然な音声で複数の言語を話すことができます。
+従来の `say` コマンドを拡張し、ElevenLabsとCartesia APIを使用した高度な音声合成機能を提供する強力なテキスト読み上げコマンドラインツールです。複数のプロバイダーから提供される高品質な音声モデルを使用して、自然な音声でテキストを読み上げることができます。
 
 ## 実際の使用例（音声付き）
 
@@ -12,8 +12,6 @@
 
 ## 機能
 
-- 🎤 **カスタム音声モデリング**: ElevenLabsとCartesiaを通じて自分の音声モデルを訓練・使用
-- 🌍 **多言語サポート**: 自動翻訳により様々な言語でテキストを読み上げ
 - 🎯 **高品質合成**: 複数のプロバイダーの高度なAI音声合成を活用
 - 💬 **シンプルなCLIインターフェース**: ネイティブの `say` コマンドに似た使いやすいコマンドラインインターフェース
 - 🔊 **音声出力オプション**: ファイルに保存またはスピーカーから直接再生
@@ -109,11 +107,8 @@ saym voice list
 # 特定のプロバイダーから音声を表示
 saym voice list -p cartesia
 
-# 音声サンプルからカスタム音声モデルを作成
-saym voice create -n "私の声" -d "個人用音声モデル" -s sample1.mp3 sample2.wav sample3.m4a
-
-# カスタム音声を削除
-saym voice delete <voice-id>
+# すべての公開音声を表示（Cartesiaの場合）
+saym voice list -p cartesia --all
 ```
 
 ### 高度なオプション
@@ -135,31 +130,23 @@ saym config reset                          # デフォルトにリセット
 saym providers
 ```
 
-### 自分の音声モデルを作成
+### カスタム音声モデルの使用
 
-1. **音声サンプルを準備**
-   - 最低30秒のクリアな音声を録音
-   - 高品質な録音を使用（背景ノイズを最小限に）
-   - サポート形式: MP3、WAV、M4A、OGG、FLAC
-   - 最大25ファイル、1ファイルあたり10MB
+カスタム音声モデルを作成するには、ElevenLabsまたはCartesiaのウェブインターフェースを使用してください：
 
-2. **音声モデルを作成**
-   ```bash
-   saym voice create \
-     --name "私の個人音声" \
-     --description "TTS用のカスタム音声" \
-     --samples voice_sample_*.mp3
-   ```
+- **ElevenLabs**: [ElevenLabs Voice Lab](https://elevenlabs.io/voice-lab)にアクセスしてカスタム音声を作成・訓練
+- **Cartesia**: [Cartesia](https://cartesia.ai/)にアクセスして音声クローニング機能を利用
 
-3. **音声を使用**
-   ```bash
-   # 作成時に返される音声IDを使用
-   saym --voice <your-voice-id> "こんにちは、これは私の声です！"
-   
-   # またはデフォルトとして設定
-   saym config set defaultVoice <your-voice-id>
-   saym "今はデフォルトで私の声を使用しています！"
-   ```
+これらのサービスでカスタム音声を作成したら、saymで使用できます：
+
+```bash
+# カスタム音声IDを使用
+saym --voice <your-voice-id> "こんにちは、これは私の声です！"
+
+# またはデフォルトとして設定
+saym config set defaultVoice <your-voice-id>
+saym "今はデフォルトで私の声を使用しています！"
+```
 
 ## 設定
 
@@ -169,7 +156,6 @@ saym providers
 {
   "defaultVoice": "your-voice-id",
   "defaultLanguage": "ja",
-  "autoTranslate": true,
   "outputFormat": "mp3",
   "ttsProvider": "elevenlabs",
   "providers": {
