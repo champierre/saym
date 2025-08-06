@@ -123,8 +123,8 @@ saym -v "japanese-voice-id" -l ja "今日は良い天気ですね"
 # スペイン語で言語を明示的に指定
 saym -v "spanish-voice-id" -l es "Hola, ¿cómo estás?"
 
-# Cartesiaで言語指定（自動検出フォールバック）
-saym -p cartesia -v "voice-id" -l ja "今日は"
+# Cartesia（自動言語検出）
+saym -p cartesia -v "voice-id" "今日は"
 ```
 
 ### 高度なオプション

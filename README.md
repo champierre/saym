@@ -123,8 +123,8 @@ saym -v "japanese-voice-id" -l ja "今日は良い天気ですね"
 # Spanish with explicit language
 saym -v "spanish-voice-id" -l es "Hola, ¿cómo estás?"
 
-# Cartesia with language (auto-detection fallback)
-saym -p cartesia -v "voice-id" -l ja "今日は"
+# Cartesia (automatic language detection)
+saym -p cartesia -v "voice-id" "今日は"
 ```
 
 ### Advanced Options

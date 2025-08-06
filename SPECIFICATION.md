@@ -134,8 +134,8 @@ saym "今日は" -v "voice-id" -l ja
 - **Fallback behavior**: Works without explicit language specification
 
 ```bash
-# Language detection works automatically
-saym "今日は" -p cartesia -v "voice-id" -l ja
+# Language detection works automatically (no -l needed)
+saym "今日は" -p cartesia -v "voice-id"
 ```
 
 ### Environment Variables
