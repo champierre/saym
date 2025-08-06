@@ -54,7 +54,7 @@ describe('VoiceManager', () => {
 
     it('should handle API errors', async () => {
       const client = (voiceManager as any).client;
-      client.get.mockRejectedValue({
+      const error = {
         isAxiosError: true,
         response: {
           data: {
@@ -63,7 +63,11 @@ describe('VoiceManager', () => {
             },
           },
         },
-      });
+      };
+      
+      // Mock axios.isAxiosError to return true
+      jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
+      client.get.mockRejectedValue(error);
 
       await expect(voiceManager.listVoices()).rejects.toThrow('Failed to list voices: API error');
     });

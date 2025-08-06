@@ -26,7 +26,7 @@ export interface TTSVoice {
   name: string;
   description?: string;
   provider: string;
-  labels?: Record<string, string>;
+  labels?: Record<string, any>;
   previewUrl?: string;
   languages?: string[];
 }

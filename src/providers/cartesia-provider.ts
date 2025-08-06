@@ -140,18 +140,35 @@ export class CartesiaProvider implements TTSProvider {
   }
 
   async listVoices(): Promise<TTSVoice[]> {
-    // Cartesia has predefined voices, we'll return a static list
-    // In a real implementation, this might come from an API endpoint
-    return [
-      {
-        id: '694f9389-aac1-45b6-b726-9d9369183238',
-        name: 'Cartesia Default',
-        description: 'Default Cartesia voice',
+    try {
+      const response = await this.client.get('/voices/', {
+        params: {
+          limit: 100, // Get all voices
+        }
+      });
+
+      const voices: TTSVoice[] = response.data.data.map((voice: any) => ({
+        id: voice.id,
+        name: voice.name,
+        description: voice.description || '',
         provider: this.name,
-        languages: ['en', 'es', 'fr', 'de', 'it', 'pt', 'pl', 'ru', 'nl', 'sv', 'no', 'da', 'fi', 'cs', 'tr'],
-      },
-      // Add more voices as they become available
-    ];
+        languages: voice.language ? [voice.language] : ['en'],
+        labels: {
+          gender: voice.gender,
+          is_owner: voice.is_owner,
+          is_public: voice.is_public,
+          is_starred: voice.is_starred,
+          created_at: voice.created_at,
+        }
+      }));
+
+      return voices;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new TTSProviderError(this.name, `Failed to list voices: ${error.response?.status} ${error.response?.data || error.message}`);
+      }
+      throw error;
+    }
   }
 
   async getVoice(voiceId: string): Promise<TTSVoice | null> {

@@ -23,6 +23,12 @@ function getProviderFromArgs(): string | undefined {
   return undefined;
 }
 
+// Helper function to check if --all flag is present
+function getAllFlagFromArgs(): boolean {
+  const args = process.argv;
+  return args.includes('-a') || args.includes('--all');
+}
+
 program
   .name('saym')
   .description('Say iMproved - Advanced text-to-speech with custom voice models')
@@ -147,8 +153,9 @@ const voice = program.command('voice').description('Voice management commands');
 // List voices
 voice
   .command('list')
-  .description('List all available voices')
+  .description('List available voices (defaults to owned voices only)')
   .option('-p, --provider <provider>', 'TTS provider (elevenlabs, cartesia)')
+  .option('-a, --all', 'Show all voices including public ones')
   .action(async () => {
     try {
       const providerType = (getProviderFromArgs() || config.get('ttsProvider') || 'elevenlabs') as ProviderType;
@@ -160,23 +167,43 @@ voice
       }
 
       const provider = await ProviderFactory.createProvider(providerType, { apiKey });
-      const voices = await provider.listVoices();
+      const allVoices = await provider.listVoices();
+      
+      // Check if --all flag is present
+      const showAll = getAllFlagFromArgs();
+      
+      // Filter voices based on the --all flag
+      let voices = allVoices;
+      if (!showAll && providerType === 'cartesia') {
+        // For Cartesia, default to showing only owned voices
+        voices = allVoices.filter(voice => voice.labels?.is_owner === true);
+      }
 
-      console.log(`Available voices for ${providerType}:`);
+      console.log(`Available voices for ${providerType}${showAll ? ' (all)' : ' (owned only)'}:`);
+      if (!showAll && providerType === 'cartesia') {
+        console.log('Use --all or -a to show all public voices');
+      }
       console.log('─'.repeat(80));
       
-      voices.forEach(voice => {
-        console.log(`ID: ${voice.id}`);
-        console.log(`Name: ${voice.name}`);
-        if (voice.description) console.log(`Description: ${voice.description}`);
-        if (voice.languages && voice.languages.length > 0) {
-          console.log(`Languages: ${voice.languages.join(', ')}`);
+      if (voices.length === 0) {
+        console.log('No voices found.');
+        if (!showAll && providerType === 'cartesia') {
+          console.log('Try using --all to see public voices.');
         }
-        if (voice.labels && Object.keys(voice.labels).length > 0) {
-          console.log(`Labels: ${JSON.stringify(voice.labels)}`);
-        }
-        console.log('─'.repeat(80));
-      });
+      } else {
+        voices.forEach(voice => {
+          console.log(`ID: ${voice.id}`);
+          console.log(`Name: ${voice.name}`);
+          if (voice.description) console.log(`Description: ${voice.description}`);
+          if (voice.languages && voice.languages.length > 0) {
+            console.log(`Languages: ${voice.languages.join(', ')}`);
+          }
+          if (voice.labels && Object.keys(voice.labels).length > 0) {
+            console.log(`Labels: ${JSON.stringify(voice.labels)}`);
+          }
+          console.log('─'.repeat(80));
+        });
+      }
     } catch (error) {
       console.error('Error:', error);
       process.exit(1);
