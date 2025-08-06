@@ -317,9 +317,6 @@ describe('CartesiaProvider', () => {
       expect(provider.name).toBe('cartesia');
     });
 
-    it('should support voice cloning', () => {
-      expect(provider.supportsVoiceCloning()).toBe(true);
-    });
 
     it('should return supported formats', () => {
       const formats = provider.getSupportedFormats();

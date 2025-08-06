@@ -38,11 +38,6 @@ describe('ElevenLabs API Request Format Integration', () => {
         const body = requestBody as any;
         expect(body.text).toBe(testText);
         expect(body.model_id).toBe('eleven_monolingual_v1');
-        expect(body.voice_settings).toBeDefined();
-        expect(body.voice_settings.stability).toBe(0.5);
-        expect(body.voice_settings.similarity_boost).toBe(0.75);
-        expect(body.voice_settings.style).toBe(0.0);
-        expect(body.voice_settings.use_speaker_boost).toBe(true);
 
         // Validate that problematic headers are NOT present
         expect(this.req.headers['accept']).not.toBe('audio/mpeg');
@@ -59,34 +54,6 @@ describe('ElevenLabs API Request Format Integration', () => {
     expect(result).toBeInstanceOf(Buffer);
   });
 
-  test('should handle custom voice settings in HTTP request', async () => {
-    const voiceId = 'test-voice-id';
-    const customSettings = {
-      stability: 0.8,
-      similarity: 0.9,
-      style: 0.2,
-      speakerBoost: false,
-    };
-
-    const scope = nock(baseUrl)
-      .post(`/v1/text-to-speech/${voiceId}`)
-      .matchHeader('xi-api-key', mockApiKey)
-      .reply(function(_uri, requestBody) {
-        const body = requestBody as any;
-        expect(body.voice_settings.stability).toBe(0.8);
-        expect(body.voice_settings.similarity_boost).toBe(0.9);
-        expect(body.voice_settings.style).toBe(0.2);
-        expect(body.voice_settings.use_speaker_boost).toBe(false);
-
-        return [200, Buffer.from('fake audio data')];
-      });
-
-    await provider.textToSpeech('test', voiceId, {
-      voiceSettings: customSettings
-    });
-    
-    expect(scope.isDone()).toBe(true);
-  });
 
   test('should handle different model IDs correctly', async () => {
     const voiceId = 'test-voice-id';

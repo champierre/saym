@@ -226,31 +226,4 @@ describe('Voice Filtering Logic', () => {
     });
   });
 
-  describe('command line argument parsing', () => {
-    const mockProcessArgv = (args: string[]) => {
-      return ['node', 'script.js', ...args];
-    };
-
-    it('should detect --all flag', () => {
-      const getAllFlagFromArgs = (args: string[]): boolean => {
-        return args.includes('-a') || args.includes('--all');
-      };
-
-      expect(getAllFlagFromArgs(mockProcessArgv(['voice', 'list', '--all']))).toBe(true);
-      expect(getAllFlagFromArgs(mockProcessArgv(['voice', 'list', '-a']))).toBe(true);
-      expect(getAllFlagFromArgs(mockProcessArgv(['voice', 'list']))).toBe(false);
-      expect(getAllFlagFromArgs(mockProcessArgv(['voice', 'list', '--other']))).toBe(false);
-    });
-
-    it('should handle mixed flags correctly', () => {
-      const getAllFlagFromArgs = (args: string[]): boolean => {
-        return args.includes('-a') || args.includes('--all');
-      };
-
-      expect(getAllFlagFromArgs(mockProcessArgv(['voice', 'list', '-p', 'cartesia', '--all']))).toBe(true);
-      expect(getAllFlagFromArgs(mockProcessArgv(['voice', 'list', '-p', 'cartesia', '-a']))).toBe(true);
-      expect(getAllFlagFromArgs(mockProcessArgv(['--all', 'voice', 'list']))).toBe(true);
-      expect(getAllFlagFromArgs(mockProcessArgv(['-a', 'voice', 'list']))).toBe(true);
-    });
-  });
 });

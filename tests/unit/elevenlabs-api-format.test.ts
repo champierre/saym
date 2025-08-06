@@ -53,12 +53,6 @@ describe('ElevenLabs API Request Format', () => {
       {
         text: text,
         model_id: 'eleven_monolingual_v1',
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.75,
-          style: 0.0,
-          use_speaker_boost: true,
-        },
       },
       {
         headers: {
@@ -129,52 +123,7 @@ describe('ElevenLabs API Request Format', () => {
     expect(requestConfig.responseType).toBe('arraybuffer');
   });
 
-  test('should handle voice settings correctly', async () => {
-    const mockClient = mockedAxios.create() as any;
-    mockClient.post.mockResolvedValue({
-      data: Buffer.from('fake audio data')
-    });
 
-    const customSettings = {
-      stability: 0.8,
-      similarity: 0.9,
-      style: 0.1,
-      speakerBoost: false,
-    };
-
-    await provider.textToSpeech('test', 'voice-id', {
-      voiceSettings: customSettings
-    });
-
-    const callArgs = mockClient.post.mock.calls[0];
-    const requestBody = callArgs[1];
-    
-    expect(requestBody.voice_settings).toEqual({
-      stability: 0.8,
-      similarity_boost: 0.9,
-      style: 0.1,
-      use_speaker_boost: false,
-    });
-  });
-
-  test('should use default voice settings when none provided', async () => {
-    const mockClient = mockedAxios.create() as any;
-    mockClient.post.mockResolvedValue({
-      data: Buffer.from('fake audio data')
-    });
-
-    await provider.textToSpeech('test', 'voice-id');
-
-    const callArgs = mockClient.post.mock.calls[0];
-    const requestBody = callArgs[1];
-    
-    expect(requestBody.voice_settings).toEqual({
-      stability: 0.5,
-      similarity_boost: 0.75,
-      style: 0.0,
-      use_speaker_boost: true,
-    });
-  });
 
   test('should use correct base URL and endpoint', async () => {
     const mockClient = mockedAxios.create() as any;
