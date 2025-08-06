@@ -211,15 +211,15 @@ saym use cartesia
 
 ```bash
 # List voices for your default provider
-saym voice list
+saym voices
 
 # List voices for a specific provider
-saym voice list -p elevenlabs
-saym voice list -p cartesia
+saym voices -p elevenlabs
+saym voices -p cartesia
 
 # List ALL voices (including public ones)
-saym voice list --all
-saym voice list -p cartesia --all
+saym voices --all
+saym voices -p cartesia --all
 ```
 
 #### Step 3: Set Provider-Specific Default Voices
@@ -268,7 +268,7 @@ saym providers
 saym use elevenlabs
 
 # 2. Find your preferred voice
-saym voice list
+saym voices
 
 # 3. Set it as default
 saym default-voice "your-voice-id"
@@ -283,7 +283,7 @@ saym "This uses my ElevenLabs default voice"
 saym use cartesia
 
 # 2. Find your preferred voice (owned voices only by default)
-saym voice list
+saym voices
 
 # 3. Set it as default
 saym default-voice "your-voice-id"
@@ -357,10 +357,10 @@ echo $ELEVENLABS_API_KEY
 echo $CARTESIA_API_KEY
 
 # Test with saym (ElevenLabs)
-saym voice list
+saym voices
 
 # Test with saym (Cartesia)
-saym voice list -p cartesia
+saym voices -p cartesia
 ```
 
 ## License

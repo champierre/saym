@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory contains comprehensive test suites for the `saym voice list` command functionality, including argument parsing, provider integration, and voice filtering features.
+This directory contains comprehensive test suites for the `saym voices` command functionality, including argument parsing, provider integration, and voice filtering features.
 
 ## Test Files
 
@@ -63,7 +63,7 @@ npm test
 
 ## Test Coverage
 
-The tests cover the following `saym voice list` functionality:
+The tests cover the following `saym voices` functionality:
 
 ✅ **Argument Parsing**
 - Provider selection (`-p`, `--provider`)
@@ -93,14 +93,14 @@ The tests verify the behavior that users experience with these commands:
 
 ```bash
 # Default: owned voices only (tested)
-saym voice list -p cartesia
+saym voices -p cartesia
 
 # All voices including public (tested)  
-saym voice list -p cartesia --all
-saym voice list -p cartesia -a
+saym voices -p cartesia --all
+saym voices -p cartesia -a
 
 # ElevenLabs (no filtering applied) (tested)
-saym voice list -p elevenlabs
+saym voices -p elevenlabs
 ```
 
 ## Error Scenarios Tested
