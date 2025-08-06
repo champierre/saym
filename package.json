@@ -14,7 +14,7 @@
     "test:integration": "jest --testPathPattern=tests/integration",
     "test:coverage": "jest --coverage",
     "test:api-format": "jest --testPathPattern=elevenlabs.*format",
-    "lint": "eslint src/**/*.ts",
+    "lint": "eslint 'src/**/*.ts'",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [

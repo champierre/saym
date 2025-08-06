@@ -70,7 +70,7 @@ export class AudioPlayer {
       case 'darwin': // macOS
         command = `afplay "${filePath}"`;
         break;
-      case 'linux':
+      case 'linux': {
         // Try multiple players in order of preference
         const players = ['mpg123', 'ffplay', 'aplay', 'mplayer'];
         const availablePlayer = await this.findAvailablePlayer(players);
@@ -79,6 +79,7 @@ export class AudioPlayer {
         }
         command = `${availablePlayer} "${filePath}"`;
         break;
+      }
       case 'win32': // Windows
         command = `powershell -c "(New-Object Media.SoundPlayer '${filePath}').PlaySync();"`;
         break;
