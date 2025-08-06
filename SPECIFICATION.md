@@ -119,9 +119,7 @@ saym [options] -f <file>
 ### Environment Variables
 
 - `ELEVENLABS_API_KEY`: ElevenLabs API key (required)
-- `SAYM_DEFAULT_VOICE`: Default voice ID
-- `SAYM_DEFAULT_LANGUAGE`: Default language code
-- `SAYM_CACHE_DIR`: Cache directory path
+- `CARTESIA_API_KEY`: Cartesia API key (optional)
 
 ## Data Flow
 
@@ -146,17 +144,7 @@ graph TD
   "defaultLanguage": "en",
   "autoTranslate": true,
   "outputFormat": "mp3",
-  "voiceSettings": {
-    "stability": 0.5,
-    "similarity_boost": 0.75,
-    "style": 0.0,
-    "use_speaker_boost": true
-  },
-  "cache": {
-    "enabled": true,
-    "maxSize": "100MB",
-    "ttl": 86400
-  }
+  "ttsProvider": "elevenlabs"
 }
 ```
 
@@ -188,17 +176,6 @@ Once created, voices can be used with saym by referencing their voice ID.
 - Circuit breaker for API failures
 
 ## Performance Considerations
-
-### Caching
-
-1. **Voice List Cache**
-   - TTL: 1 hour
-   - Invalidated on voice operations
-
-2. **Audio Cache**
-   - Hash-based (text + voice + settings)
-   - LRU eviction policy
-   - Configurable size limit
 
 ### Streaming
 

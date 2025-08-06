@@ -109,7 +109,6 @@ try {
 - Rate limiting: 100 requests/minute
 - Always check for valid API key before requests
 - Implement exponential backoff for retries
-- Cache voice list for performance
 - Stream audio for large texts
 
 ### Cartesia API
@@ -167,12 +166,6 @@ try {
 - Implement rate limiting for API calls
 
 ## Performance Optimization
-
-### Caching Strategy
-- Cache voice list (1 hour TTL)
-- Cache synthesized audio (hash-based)
-- Implement LRU eviction
-- Make cache configurable
 
 ### Streaming
 - Use streaming for large texts

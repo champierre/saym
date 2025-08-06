@@ -19,11 +19,6 @@ export class ConfigManager {
     const defaultConfig: Config = {
       defaultLanguage: 'en',
       outputFormat: 'mp3',
-      cache: {
-        enabled: true,
-        maxSize: '100MB',
-        ttl: 86400,
-      },
       ttsProvider: 'elevenlabs',
       providers: {},
     };

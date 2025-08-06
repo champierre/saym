@@ -2,11 +2,6 @@ export interface Config {
   defaultVoice?: string;
   defaultLanguage?: string;
   outputFormat?: 'mp3' | 'wav' | 'ogg';
-  cache?: {
-    enabled: boolean;
-    maxSize: string;
-    ttl: number;
-  };
   ttsProvider?: 'elevenlabs' | 'cartesia';
   providers?: {
     elevenlabs?: {
