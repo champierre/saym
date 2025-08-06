@@ -2,24 +2,26 @@
 
 ## Project Overview
 
-saym (Say iMproved) is a CLI tool that extends the traditional `say` command with ElevenLabs API integration for advanced text-to-speech capabilities, including custom voice modeling and multi-language support with translation.
+saym (Say iMproved) is a CLI tool that extends the traditional `say` command with advanced text-to-speech capabilities using multiple TTS providers (ElevenLabs and Cartesia).
 
 ## Key Project Information
 
 ### Technology Stack
 - **Runtime**: Node.js 18+ or Deno
 - **Language**: TypeScript
-- **API**: ElevenLabs Text-to-Speech API
+- **APIs**: ElevenLabs and Cartesia Text-to-Speech APIs
 - **Audio Processing**: FFmpeg
-- **Translation**: Google Translate API (primary), DeepL/OpenAI (optional)
 
 ### Project Structure
 ```
 saym/
 ├── src/
 │   ├── cli.ts              # CLI entry point and argument parsing
-│   ├── voice-engine.ts     # ElevenLabs API integration
-│   ├── translator.ts       # Translation module
+│   ├── providers/          # TTS provider implementations
+│   │   ├── tts-provider.ts     # Provider interface
+│   │   ├── elevenlabs-provider.ts # ElevenLabs integration
+│   │   ├── cartesia-provider.ts   # Cartesia integration
+│   │   └── provider-factory.ts    # Provider factory
 │   ├── voice-manager.ts    # Voice model management
 │   ├── audio.ts           # Audio playback and file handling
 │   ├── config.ts          # Configuration management
@@ -110,11 +112,12 @@ try {
 - Cache voice list for performance
 - Stream audio for large texts
 
-### Translation APIs
-- Support multiple providers via adapter pattern
-- Cache translations to reduce API calls
-- Implement language detection fallback
-- Handle unsupported language pairs gracefully
+### Cartesia API
+- Ultra-low latency TTS (40-90ms)
+- WebSocket streaming support
+- Multiple audio formats supported
+- Rate limiting varies by plan
+
 
 ## Common Development Tasks
 
@@ -125,19 +128,21 @@ try {
 4. Add validation if needed
 5. Update tests and documentation
 
-### Implementing a New Voice Feature
-1. Add the feature to `src/voice-engine.ts`
-2. Update the ElevenLabs API types
+### Implementing a New TTS Feature
+1. Add the feature to the appropriate provider (e.g., `src/providers/elevenlabs-provider.ts`)
+2. Update the provider API types
 3. Add configuration options if needed
 4. Update the CLI to expose the feature
 5. Add unit and integration tests
 
-### Adding Translation Provider
-1. Create new adapter in `src/translator.ts`
-2. Implement the TranslationProvider interface
-3. Add configuration for API keys
-4. Update provider selection logic
-5. Add provider-specific tests
+### Adding a New TTS Provider
+1. Create new provider implementation in `src/providers/`
+2. Implement the TTSProvider interface
+3. Add provider to ProviderFactory
+4. Add configuration for API keys
+5. Update provider selection logic
+6. Add provider-specific tests
+
 
 ## Testing Guidelines
 
@@ -178,9 +183,9 @@ try {
 ## Debugging Tips
 
 ### Common Issues
-1. **API Key Issues**: Check environment variable is set
+1. **API Key Issues**: Check environment variable is set (ELEVENLABS_API_KEY or CARTESIA_API_KEY)
 2. **Audio Playback**: Verify FFmpeg is installed
-3. **Translation Errors**: Check language codes are valid
+3. **Provider Selection**: Ensure correct provider is specified with -p flag
 4. **Network Issues**: Implement proper timeout handling
 
 ### Debug Mode

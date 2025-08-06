@@ -12,8 +12,6 @@ This video demonstrates saym reading its own command description using ElevenLab
 
 ## Features
 
-- 🎤 **Custom Voice Modeling**: Train and use your own voice model through ElevenLabs and Cartesia
-- 🌍 **Multi-language Support**: Speak text in various languages with automatic translation
 - 🎯 **High-Quality Synthesis**: Leverage advanced AI voice synthesis from multiple providers
 - 💬 **Simple CLI Interface**: Easy-to-use command-line interface similar to the native `say` command
 - 🔊 **Audio Output Options**: Save to file or play directly through speakers
@@ -109,11 +107,8 @@ saym voice list
 # List voices from a specific provider
 saym voice list -p cartesia
 
-# Create a custom voice model from audio samples
-saym voice create -n "My Voice" -d "Personal voice model" -s sample1.mp3 sample2.wav sample3.m4a
-
-# Delete a custom voice
-saym voice delete <voice-id>
+# List all public voices (for Cartesia)
+saym voice list -p cartesia --all
 ```
 
 ### Advanced Options
@@ -135,31 +130,23 @@ saym config reset                          # Reset to defaults
 saym providers
 ```
 
-### Creating Your Own Voice Model
+### Using Custom Voice Models
 
-1. **Prepare Audio Samples**
-   - Record at least 30 seconds of clear speech
-   - Use high-quality recordings (minimal background noise)
-   - Supported formats: MP3, WAV, M4A, OGG, FLAC
-   - Maximum 25 files, 10MB per file
+To create custom voice models, use the ElevenLabs or Cartesia web interfaces:
 
-2. **Create Voice Model**
-   ```bash
-   saym voice create \
-     --name "My Personal Voice" \
-     --description "My custom voice for TTS" \
-     --samples voice_sample_*.mp3
-   ```
+- **ElevenLabs**: Visit [ElevenLabs Voice Lab](https://elevenlabs.io/voice-lab) to create and train custom voices
+- **Cartesia**: Visit [Cartesia](https://cartesia.ai/) to access voice cloning features
 
-3. **Use Your Voice**
-   ```bash
-   # Use the voice ID returned from creation
-   saym --voice <your-voice-id> "Hello, this is my voice!"
-   
-   # Or set as default
-   saym config set defaultVoice <your-voice-id>
-   saym "Now using my voice by default!"
-   ```
+Once you have created a custom voice through these services, you can use it with saym:
+
+```bash
+# Use your custom voice ID
+saym --voice <your-voice-id> "Hello, this is my voice!"
+
+# Or set as default
+saym config set defaultVoice <your-voice-id>
+saym "Now using my voice by default!"
+```
 
 ## Configuration
 

@@ -25,9 +25,6 @@ export class ConfigManager {
         style: 0.0,
         use_speaker_boost: true,
       },
-      translation: {
-        provider: 'google',
-      },
       cache: {
         enabled: true,
         maxSize: '100MB',
@@ -123,20 +120,4 @@ export class ConfigManager {
     }
   }
 
-  /**
-   * Get translation API key
-   */
-  getTranslationApiKey(): string | undefined {
-    const provider = this.config.translation?.provider;
-    switch (provider) {
-      case 'google':
-        return process.env.GOOGLE_TRANSLATE_API_KEY;
-      case 'deepl':
-        return process.env.DEEPL_API_KEY;
-      case 'openai':
-        return process.env.OPENAI_API_KEY;
-      default:
-        return undefined;
-    }
-  }
 }

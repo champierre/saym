@@ -2,7 +2,7 @@
 
 ## Overview
 
-saym (Say iMproved) is a command-line text-to-speech application that enhances the traditional Unix `say` command by integrating advanced voice synthesis APIs from multiple providers (ElevenLabs and Cartesia). It enables users to create custom voice models, translate text, and generate high-quality speech in multiple languages.
+saym (Say iMproved) is a command-line text-to-speech application that enhances the traditional Unix `say` command by integrating advanced voice synthesis APIs from multiple providers (ElevenLabs and Cartesia). It enables users to generate high-quality speech using pre-trained voice models from multiple providers.
 
 ## Architecture
 
@@ -20,14 +20,8 @@ saym (Say iMproved) is a command-line text-to-speech application that enhances t
    - Voice synthesis orchestration
    - Audio stream management
 
-3. **Translation Module** (`src/translator.ts`)
-   - Multi-language translation support
-   - Language detection
-   - Translation API integration
-
-4. **Voice Manager** (`src/voice-manager.ts`)
+3. **Voice Manager** (`src/voice-manager.ts`)
    - Voice model management
-   - Voice training interface
    - Voice parameter customization
 
 5. **Audio Handler** (`src/audio.ts`)
@@ -55,8 +49,6 @@ The application uses a provider abstraction layer to support multiple TTS servic
 
 2. **Voice Management**
    - `GET /v1/voices`
-   - `POST /v1/voices/add`
-   - `DELETE /v1/voices/{voice_id}`
 
 ### Cartesia API
 
@@ -69,11 +61,7 @@ The application uses a provider abstraction layer to support multiple TTS servic
 2. **Features**
    - Ultra-low latency (40-90ms)
    - Multiple language support
-   - Voice cloning capabilities
 
-3. **Voice Cloning**
-   - `POST /v1/voice-generation/create-voice`
-   - `GET /v1/voice-generation/history`
 
 #### Request/Response Format
 
@@ -102,12 +90,6 @@ interface VoiceResponse {
 }
 ```
 
-### Translation API
-
-The translation module supports multiple providers:
-
-1. **Google Translate API** (default)
-2. **DeepL API** (optional)
 3. **OpenAI API** (optional)
 
 ## Command-Line Interface
@@ -125,7 +107,6 @@ saym [options] -f <file>
 |--------|-------|-------------|---------|
 | `--voice` | `-v` | Voice ID or name | User's default voice |
 | `--language` | `-l` | Target language code | `en` |
-| `--translate` | `-t` | Enable translation | `false` |
 | `--output` | `-o` | Output file path | None (play audio) |
 | `--format` | | Audio format (mp3, wav, ogg) | `mp3` |
 | `--stability` | | Voice stability (0.0-1.0) | `0.5` |
@@ -133,8 +114,6 @@ saym [options] -f <file>
 | `--style` | | Style exaggeration (0.0-1.0) | `0.0` |
 | `--speaker-boost` | | Enable speaker boost | `true` |
 | `--stream` | `-s` | Stream audio playback | `false` |
-| `--list-voices` | | List available voices | - |
-| `--train-voice` | | Train new voice model | - |
 | `--config` | `-c` | Config file path | `~/.saymrc` |
 
 ### Environment Variables
@@ -142,7 +121,6 @@ saym [options] -f <file>
 - `ELEVENLABS_API_KEY`: ElevenLabs API key (required)
 - `SAYM_DEFAULT_VOICE`: Default voice ID
 - `SAYM_DEFAULT_LANGUAGE`: Default language code
-- `SAYM_TRANSLATION_API`: Translation API provider
 - `SAYM_CACHE_DIR`: Cache directory path
 
 ## Data Flow
@@ -150,15 +128,12 @@ saym [options] -f <file>
 ```mermaid
 graph TD
     A[User Input] --> B[CLI Parser]
-    B --> C{Translation Required?}
-    C -->|Yes| D[Translation Module]
-    C -->|No| E[Voice Engine]
-    D --> E
-    E --> F[ElevenLabs API]
-    F --> G[Audio Stream]
-    G --> H{Output Mode}
-    H -->|File| I[File Writer]
-    H -->|Playback| J[Audio Player]
+    B --> C[Voice Engine]
+    C --> D[ElevenLabs API]
+    D --> E[Audio Stream]
+    E --> F{Output Mode}
+    F -->|File| G[File Writer]
+    F -->|Playback| H[Audio Player]
 ```
 
 ## Configuration
@@ -177,10 +152,6 @@ graph TD
     "style": 0.0,
     "use_speaker_boost": true
   },
-  "translation": {
-    "provider": "google",
-    "apiKey": "translation_api_key"
-  },
   "cache": {
     "enabled": true,
     "maxSize": "100MB",
@@ -189,33 +160,14 @@ graph TD
 }
 ```
 
-## Voice Training
+## Voice Management
 
-### Process
+Voice models are created through the respective provider's web interfaces:
 
-1. **Sample Collection**
-   - Minimum 30 seconds of clear audio
-   - Multiple samples recommended
-   - Supported formats: mp3, wav, m4a
+- **ElevenLabs**: Use the [ElevenLabs Voice Lab](https://elevenlabs.io/voice-lab) to create custom voices
+- **Cartesia**: Use the Cartesia web interface to create voice models
 
-2. **Voice Generation**
-   - Upload samples to ElevenLabs
-   - Configure voice parameters
-   - Generate voice model
-
-3. **Voice Storage**
-   - Store voice ID locally
-   - Cache voice metadata
-   - Enable quick access
-
-### Training Command
-
-```bash
-saym --train-voice \
-  --name "My Voice" \
-  --description "Personal voice model" \
-  --samples /path/to/samples/*.wav
-```
+Once created, voices can be used with saym by referencing their voice ID.
 
 ## Error Handling
 
@@ -225,7 +177,6 @@ saym --train-voice \
 |------|-------------|------------|
 | `E001` | Missing API key | Set ELEVENLABS_API_KEY |
 | `E002` | Invalid voice ID | Check voice exists |
-| `E003` | Translation failed | Verify language code |
 | `E004` | Audio playback error | Check audio system |
 | `E005` | Network error | Check connection |
 | `E006` | Quota exceeded | Check API limits |
@@ -288,7 +239,6 @@ npm run test:integration
 - CLI argument parsing: 95%
 - API integration: 90%
 - Audio handling: 85%
-- Translation: 90%
 
 ## Future Enhancements
 

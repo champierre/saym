@@ -59,20 +59,6 @@ export interface TTSProvider {
    */
   getVoice(voiceId: string): Promise<TTSVoice | null>;
   
-  /**
-   * Check if provider supports voice cloning
-   */
-  supportsVoiceCloning(): boolean;
-  
-  /**
-   * Create custom voice (if supported)
-   */
-  createVoice?(name: string, samples: Buffer[], description?: string): Promise<string>;
-  
-  /**
-   * Delete custom voice (if supported)
-   */
-  deleteVoice?(voiceId: string): Promise<void>;
   
   /**
    * Get supported audio formats

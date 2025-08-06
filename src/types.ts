@@ -35,20 +35,6 @@ export interface TextToSpeechRequest {
   voice_settings?: VoiceSettings;
 }
 
-export interface VoiceCloneRequest {
-  name: string;
-  description?: string;
-  files: Array<{
-    data: Buffer;
-    filename: string;
-    contentType: string;
-  }>;
-  labels?: Record<string, string>;
-}
-
-export interface VoiceGenerationResponse {
-  voice_id: string;
-}
 
 export interface ElevenLabsError {
   detail: {
@@ -60,13 +46,8 @@ export interface ElevenLabsError {
 export interface Config {
   defaultVoice?: string;
   defaultLanguage?: string;
-  autoTranslate?: boolean;
   outputFormat?: 'mp3' | 'wav' | 'ogg';
   voiceSettings?: VoiceSettings;
-  translation?: {
-    provider: 'google' | 'deepl' | 'openai';
-    apiKey?: string;
-  };
   cache?: {
     enabled: boolean;
     maxSize: string;

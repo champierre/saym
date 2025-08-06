@@ -1,6 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
 import { Readable } from 'stream';
-import FormData from 'form-data';
 import { 
   TTSProvider, 
   TTSProviderConfig, 
@@ -142,55 +141,6 @@ export class ElevenLabsProvider implements TTSProvider {
     }
   }
 
-  supportsVoiceCloning(): boolean {
-    return true;
-  }
-
-  async createVoice(name: string, samples: Buffer[], description?: string): Promise<string> {
-    try {
-      const formData = new FormData();
-      
-      formData.append('name', name);
-      if (description) {
-        formData.append('description', description);
-      }
-
-      // Add audio files
-      samples.forEach((sample, index) => {
-        formData.append('files', sample, {
-          filename: `sample${index}.mp3`,
-          contentType: 'audio/mpeg',
-        });
-      });
-
-      const response = await this.client.post('/voices/add', formData, {
-        headers: {
-          ...formData.getHeaders(),
-        },
-        maxContentLength: Infinity,
-        maxBodyLength: Infinity,
-      });
-
-      return response.data.voice_id;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const errorMessage = error.response?.data?.detail?.message || error.message;
-        throw new TTSProviderError(this.name, `Failed to create voice: ${errorMessage}`);
-      }
-      throw error;
-    }
-  }
-
-  async deleteVoice(voiceId: string): Promise<void> {
-    try {
-      await this.client.delete(`/voices/${voiceId}`);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new TTSProviderError(this.name, `Failed to delete voice: ${error.response?.data?.detail?.message || error.message}`);
-      }
-      throw error;
-    }
-  }
 
   getSupportedFormats(): string[] {
     return ['mp3_44100_128', 'mp3_44100_64', 'mp3_44100_32', 'mp3_44100_16', 'pcm_16000', 'pcm_22050', 'pcm_24000', 'pcm_44100'];

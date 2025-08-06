@@ -176,20 +176,6 @@ export class CartesiaProvider implements TTSProvider {
     return voices.find(v => v.id === voiceId) || null;
   }
 
-  supportsVoiceCloning(): boolean {
-    return true; // Cartesia supports voice cloning
-  }
-
-  async createVoice(_name: string, _samples: Buffer[], _description?: string): Promise<string> {
-    // Cartesia voice cloning API would go here
-    // This is a placeholder as the specific API endpoint wasn't found in docs
-    throw new TTSProviderError(this.name, 'Voice cloning API not yet implemented');
-  }
-
-  async deleteVoice(_voiceId: string): Promise<void> {
-    // Cartesia voice deletion API would go here
-    throw new TTSProviderError(this.name, 'Voice deletion API not yet implemented');
-  }
 
   getSupportedFormats(): string[] {
     return ['wav', 'raw', 'mp3'];
