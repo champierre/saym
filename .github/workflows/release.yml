@@ -1,0 +1,106 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  test-before-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run full test suite
+      run: npm test
+      
+    - name: Run API format validation
+      run: npm run test:api-format
+      
+    - name: Build project
+      run: npm run build
+      
+    - name: Verify CLI functionality
+      run: |
+        node dist/cli.js --help
+        node dist/cli.js config show
+        node dist/cli.js providers
+        node dist/cli.js voice list --help
+
+  release:
+    needs: test-before-release
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
+        registry-url: 'https://registry.npmjs.org'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build project
+      run: npm run build
+      
+    - name: Extract version from tag
+      id: version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      
+    - name: Update package.json version
+      run: npm version ${{ steps.version.outputs.VERSION }} --no-git-tag-version
+      
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ steps.version.outputs.VERSION }}
+        body: |
+          ## Changes in v${{ steps.version.outputs.VERSION }}
+          
+          ### ✅ Validated Features
+          - ElevenLabs TTS integration working correctly
+          - Cartesia TTS provider support
+          - Voice listing and filtering functionality
+          - API request format validation passed
+          
+          ### 🧪 Test Coverage
+          All tests including critical API format validation have passed.
+          
+          ### 📦 Installation
+          ```bash
+          npm install -g saym@${{ steps.version.outputs.VERSION }}
+          ```
+          
+          ### 🔧 Setup
+          ```bash
+          export ELEVENLABS_API_KEY="your-api-key"
+          export CARTESIA_API_KEY="your-api-key"
+          saym "Hello world"
+          ```
+        draft: false
+        prerelease: false
+        
+    # Uncomment when ready to publish to npm
+    # - name: Publish to NPM
+    #   run: npm publish
+    #   env:
+    #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

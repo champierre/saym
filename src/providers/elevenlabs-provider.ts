@@ -30,6 +30,7 @@ export class ElevenLabsProvider implements TTSProvider {
 
   async textToSpeech(text: string, voiceId: string, options?: TTSOptions): Promise<Buffer> {
     try {
+      
       const response = await this.client.post(
         `/text-to-speech/${voiceId}`,
         {
@@ -44,11 +45,7 @@ export class ElevenLabsProvider implements TTSProvider {
         },
         {
           headers: {
-            'Accept': 'audio/mpeg',
             'Content-Type': 'application/json',
-          },
-          params: {
-            output_format: options?.outputFormat || 'mp3_44100_128',
           },
           responseType: 'arraybuffer',
         }
@@ -57,7 +54,29 @@ export class ElevenLabsProvider implements TTSProvider {
       return Buffer.from(response.data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        const errorMessage = error.response?.data?.detail?.message || error.message;
+        // Extract detailed error message from ElevenLabs API response
+        const responseData = error.response?.data;
+        let errorMessage = error.message;
+        
+        if (responseData) {
+          if (typeof responseData === 'string') {
+            errorMessage = responseData;
+          } else if (responseData.detail) {
+            if (typeof responseData.detail === 'string') {
+              errorMessage = responseData.detail;
+            } else if (responseData.detail.message) {
+              errorMessage = responseData.detail.message;
+            }
+          } else if (responseData.message) {
+            errorMessage = responseData.message;
+          }
+        }
+        
+        // Add status code for debugging
+        if (error.response?.status === 403) {
+          errorMessage = `${errorMessage} (403 Forbidden - Check your subscription quota at https://elevenlabs.io/)`;
+        }
+        
         throw new TTSProviderError(this.name, `Text-to-speech failed: ${errorMessage}`);
       }
       throw error;
@@ -108,7 +127,10 @@ export class ElevenLabsProvider implements TTSProvider {
         name: voice.name,
         description: voice.description,
         provider: this.name,
-        labels: voice.labels,
+        labels: {
+          ...voice.labels,
+          category: voice.category  // Add category to labels for filtering
+        },
         previewUrl: voice.preview_url,
         languages: voice.available_for_tiers ? ['en'] : [], // ElevenLabs doesn't provide language info directly
       }));

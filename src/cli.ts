@@ -174,20 +174,25 @@ voice
       
       // Filter voices based on the --all flag
       let voices = allVoices;
-      if (!showAll && providerType === 'cartesia') {
-        // For Cartesia, default to showing only owned voices
-        voices = allVoices.filter(voice => voice.labels?.is_owner === true);
+      if (!showAll) {
+        // Default to showing only owned/custom voices for both providers
+        if (providerType === 'cartesia') {
+          voices = allVoices.filter(voice => voice.labels?.is_owner === true);
+        } else if (providerType === 'elevenlabs') {
+          // For ElevenLabs, filter to show only cloned voices (user-created)
+          voices = allVoices.filter(voice => voice.labels?.category === 'cloned');
+        }
       }
 
       console.log(`Available voices for ${providerType}${showAll ? ' (all)' : ' (owned only)'}:`);
-      if (!showAll && providerType === 'cartesia') {
+      if (!showAll) {
         console.log('Use --all or -a to show all public voices');
       }
       console.log('─'.repeat(80));
       
       if (voices.length === 0) {
         console.log('No voices found.');
-        if (!showAll && providerType === 'cartesia') {
+        if (!showAll) {
           console.log('Try using --all to see public voices.');
         }
       } else {
