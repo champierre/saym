@@ -36,12 +36,6 @@ export class ElevenLabsProvider implements TTSProvider {
         {
           text,
           model_id: options?.modelId || 'eleven_monolingual_v1',
-          voice_settings: {
-            stability: options?.voiceSettings?.stability ?? 0.5,
-            similarity_boost: options?.voiceSettings?.similarity ?? 0.75,
-            style: options?.voiceSettings?.style ?? 0.0,
-            use_speaker_boost: options?.voiceSettings?.speakerBoost ?? true,
-          },
         },
         {
           headers: {
@@ -90,12 +84,6 @@ export class ElevenLabsProvider implements TTSProvider {
         {
           text,
           model_id: options?.modelId || 'eleven_monolingual_v1',
-          voice_settings: {
-            stability: options?.voiceSettings?.stability ?? 0.5,
-            similarity_boost: options?.voiceSettings?.similarity ?? 0.75,
-            style: options?.voiceSettings?.style ?? 0.0,
-            use_speaker_boost: options?.voiceSettings?.speakerBoost ?? true,
-          },
         },
         {
           headers: {

@@ -1,10 +1,3 @@
-export interface VoiceSettings {
-  stability: number;
-  similarity_boost: number;
-  style?: number;
-  use_speaker_boost?: boolean;
-}
-
 export interface Voice {
   voice_id: string;
   name: string;
@@ -18,7 +11,6 @@ export interface Voice {
   description?: string;
   preview_url?: string;
   available_for_tiers?: string[];
-  settings?: VoiceSettings;
 }
 
 export interface VoiceSample {
@@ -32,7 +24,6 @@ export interface VoiceSample {
 export interface TextToSpeechRequest {
   text: string;
   model_id?: string;
-  voice_settings?: VoiceSettings;
 }
 
 
@@ -47,7 +38,6 @@ export interface Config {
   defaultVoice?: string;
   defaultLanguage?: string;
   outputFormat?: 'mp3' | 'wav' | 'ogg';
-  voiceSettings?: VoiceSettings;
   cache?: {
     enabled: boolean;
     maxSize: string;

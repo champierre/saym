@@ -5,7 +5,6 @@ import fs from 'fs';
 import dotenv from 'dotenv';
 import { AudioPlayer } from './audio';
 import { ConfigManager } from './config';
-import { TTSVoiceSettings } from './providers/tts-provider';
 import { ProviderFactory, ProviderType } from './providers/provider-factory';
 
 dotenv.config();
@@ -26,10 +25,6 @@ program
   .option('-o, --output <file>', 'Output audio file')
   .option('-p, --provider <provider>', 'TTS provider (elevenlabs, cartesia)')
   .option('--format <format>', 'Audio format (mp3, wav, ogg)', 'mp3')
-  .option('--stability <value>', 'Voice stability (0.0-1.0)', parseFloat, 0.5)
-  .option('--similarity <value>', 'Similarity boost (0.0-1.0)', parseFloat, 0.75)
-  .option('--style <value>', 'Style exaggeration (0.0-1.0)', parseFloat, 0.0)
-  .option('--speaker-boost', 'Enable speaker boost', true)
   .option('-s, --stream', 'Stream audio playback', false)
   .action(async (text, options) => {
     try {
@@ -83,20 +78,11 @@ program
         }
       }
 
-      // Prepare voice settings
-      const voiceSettings: TTSVoiceSettings = {
-        stability: options.stability,
-        similarity: options.similarity,
-        style: options.style,
-        speakerBoost: options.speakerBoost,
-      };
-
       console.log(`Speaking with ${providerType} voice: ${voiceId}`);
 
       if (options.stream) {
         // Stream mode
         const stream = await provider.textToSpeechStream(inputText, voiceId, { 
-          voiceSettings, 
           outputFormat: options.format 
         });
         
@@ -112,7 +98,6 @@ program
       } else {
         // Buffer mode
         const audio = await provider.textToSpeech(inputText, voiceId, { 
-          voiceSettings, 
           outputFormat: options.format 
         });
         

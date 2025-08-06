@@ -19,12 +19,6 @@ export class ConfigManager {
     const defaultConfig: Config = {
       defaultLanguage: 'en',
       outputFormat: 'mp3',
-      voiceSettings: {
-        stability: 0.5,
-        similarity_boost: 0.75,
-        style: 0.0,
-        use_speaker_boost: true,
-      },
       cache: {
         enabled: true,
         maxSize: '100MB',

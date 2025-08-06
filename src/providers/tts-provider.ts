@@ -5,18 +5,7 @@ export interface TTSProviderConfig {
   [key: string]: any;
 }
 
-export interface TTSVoiceSettings {
-  // Common settings across providers
-  stability?: number;
-  similarity?: number;
-  style?: number;
-  speakerBoost?: boolean;
-  // Provider-specific settings
-  [key: string]: any;
-}
-
 export interface TTSOptions {
-  voiceSettings?: TTSVoiceSettings;
   outputFormat?: string;
   modelId?: string;
 }

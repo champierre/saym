@@ -15,7 +15,7 @@ This video demonstrates saym reading its own command description using ElevenLab
 - 🎯 **High-Quality Synthesis**: Leverage advanced AI voice synthesis from multiple providers
 - 💬 **Simple CLI Interface**: Easy-to-use command-line interface similar to the native `say` command
 - 🔊 **Audio Output Options**: Save to file or play directly through speakers
-- 🎛️ **Voice Customization**: Adjust voice parameters like stability, similarity boost, and style
+- 🎛️ **Voice Customization**: High-quality voice synthesis with provider-optimized settings
 - 🔄 **Multiple Providers**: Support for both ElevenLabs and Cartesia TTS APIs
 
 ## Installation
@@ -114,9 +114,6 @@ saym voice list -p cartesia --all
 ### Advanced Options
 
 ```bash
-# Adjust voice parameters
-saym --stability 0.8 --similarity 0.9 --style 0.2 "Fine-tuned voice output"
-
 # Use different audio format
 saym --format wav -o output.wav "Save as WAV file"
 

@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import fs from 'fs';
 import { Readable } from 'stream';
-import { VoiceSettings, VoiceEngineError } from './types';
+import { VoiceEngineError } from './types';
 
 export class VoiceEngine {
   private client: AxiosInstance;
@@ -28,7 +28,6 @@ export class VoiceEngine {
     voiceId: string,
     options?: {
       modelId?: string;
-      voiceSettings?: VoiceSettings;
       outputFormat?: 'mp3_44100_128' | 'mp3_44100_64' | 'mp3_44100_32' | 'mp3_44100_16' | 'pcm_16000' | 'pcm_22050' | 'pcm_24000' | 'pcm_44100';
     }
   ): Promise<Buffer> {
@@ -38,12 +37,6 @@ export class VoiceEngine {
         {
           text,
           model_id: options?.modelId || 'eleven_monolingual_v1',
-          voice_settings: options?.voiceSettings || {
-            stability: 0.5,
-            similarity_boost: 0.75,
-            style: 0.0,
-            use_speaker_boost: true,
-          },
         },
         {
           headers: {
@@ -75,7 +68,6 @@ export class VoiceEngine {
     voiceId: string,
     options?: {
       modelId?: string;
-      voiceSettings?: VoiceSettings;
       outputFormat?: string;
     }
   ): Promise<Readable> {
@@ -85,12 +77,6 @@ export class VoiceEngine {
         {
           text,
           model_id: options?.modelId || 'eleven_monolingual_v1',
-          voice_settings: options?.voiceSettings || {
-            stability: 0.5,
-            similarity_boost: 0.75,
-            style: 0.0,
-            use_speaker_boost: true,
-          },
         },
         {
           headers: {
