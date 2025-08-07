@@ -96,7 +96,7 @@ export class ConfigManager {
   /**
    * Get API key from environment or config
    */
-  getApiKey(provider?: 'elevenlabs' | 'cartesia'): string | undefined {
+  getApiKey(provider?: 'elevenlabs' | 'cartesia' | 'xtts'): string | undefined {
     const ttsProvider = provider || this.config.ttsProvider || 'elevenlabs';
     
     switch (ttsProvider) {
@@ -104,6 +104,8 @@ export class ConfigManager {
         return process.env.ELEVENLABS_API_KEY || this.config.providers?.elevenlabs?.apiKey;
       case 'cartesia':
         return process.env.CARTESIA_API_KEY || this.config.providers?.cartesia?.apiKey;
+      case 'xtts':
+        return process.env.XTTS_API_KEY || this.config.providers?.xtts?.apiKey || 'none';
       default:
         return undefined;
     }
@@ -112,7 +114,7 @@ export class ConfigManager {
   /**
    * Get default voice for a specific provider
    */
-  getDefaultVoice(provider?: 'elevenlabs' | 'cartesia'): string | undefined {
+  getDefaultVoice(provider?: 'elevenlabs' | 'cartesia' | 'xtts'): string | undefined {
     const ttsProvider = provider || this.config.ttsProvider || 'elevenlabs';
     
     // First check provider-specific default voice
@@ -127,6 +129,11 @@ export class ConfigManager {
           return this.config.providers.cartesia.defaultVoice;
         }
         break;
+      case 'xtts':
+        if (this.config.providers?.xtts?.defaultVoice) {
+          return this.config.providers.xtts.defaultVoice;
+        }
+        break;
     }
     
     // Fallback to global default voice
@@ -136,7 +143,7 @@ export class ConfigManager {
   /**
    * Set default voice for a specific provider
    */
-  setProviderDefaultVoice(provider: 'elevenlabs' | 'cartesia', voiceId: string): void {
+  setProviderDefaultVoice(provider: 'elevenlabs' | 'cartesia' | 'xtts', voiceId: string): void {
     if (!this.config.providers) {
       this.config.providers = {};
     }
@@ -149,4 +156,10 @@ export class ConfigManager {
     this.saveConfig();
   }
 
+  /**
+   * Get XTTS server URL from environment or config
+   */
+  getXTTSServerUrl(): string {
+    return process.env.XTTS_SERVER_URL || this.config.providers?.xtts?.serverUrl || 'http://localhost:8020';
+  }
 }

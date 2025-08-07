@@ -1,8 +1,9 @@
 import { TTSProvider, TTSProviderConfig } from './tts-provider';
 import { ElevenLabsProvider } from './elevenlabs-provider';
 import { CartesiaProvider } from './cartesia-provider';
+import { XTTSProvider } from './xtts-provider';
 
-export type ProviderType = 'elevenlabs' | 'cartesia';
+export type ProviderType = 'elevenlabs' | 'cartesia' | 'xtts';
 
 export class ProviderFactory {
   private static providers: Map<string, TTSProvider> = new Map();
@@ -23,6 +24,9 @@ export class ProviderFactory {
       case 'cartesia':
         provider = new CartesiaProvider();
         break;
+      case 'xtts':
+        provider = new XTTSProvider();
+        break;
       default:
         throw new Error(`Unknown provider type: ${type}`);
     }
@@ -42,6 +46,6 @@ export class ProviderFactory {
   }
 
   static getSupportedProviders(): ProviderType[] {
-    return ['elevenlabs', 'cartesia'];
+    return ['elevenlabs', 'cartesia', 'xtts'];
   }
 }

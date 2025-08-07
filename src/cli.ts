@@ -23,7 +23,7 @@ program
   .option('-v, --voice <voice>', 'Voice ID or name')
   .option('-f, --file <file>', 'Input text file')
   .option('-o, --output <file>', 'Output audio file')
-  .option('-p, --provider <provider>', 'TTS provider (elevenlabs, cartesia)')
+  .option('-p, --provider <provider>', 'TTS provider (elevenlabs, cartesia, xtts)')
   .option('-l, --language <language>', 'Language code (e.g., ja, en, es)', 'en')
   .option('--format <format>', 'Audio format (mp3, wav, ogg)', 'mp3')
   .option('-s, --stream', 'Stream audio playback', false)
@@ -39,8 +39,12 @@ program
         process.exit(1);
       }
 
-      // Create provider instance
-      const provider = await ProviderFactory.createProvider(providerType, { apiKey });
+      // Create provider instance with appropriate config
+      let providerConfig: any = { apiKey };
+      if (providerType === 'xtts') {
+        providerConfig.serverUrl = config.getXTTSServerUrl();
+      }
+      const provider = await ProviderFactory.createProvider(providerType, providerConfig);
       const audioPlayer = new AudioPlayer();
 
       // Get text input
@@ -123,7 +127,7 @@ program
 program
   .command('voices')
   .description('List available voices for current provider (defaults to owned voices only)')
-  .option('-p, --provider <provider>', 'TTS provider (elevenlabs, cartesia)')
+  .option('-p, --provider <provider>', 'TTS provider (elevenlabs, cartesia, xtts)')
   .option('-a, --all', 'Show all voices including public ones')
   .action(async (options) => {
     try {
@@ -138,7 +142,7 @@ program
       }
 
       console.log(`Current provider: ${currentProvider}`);
-      const defaultVoice = config.getDefaultVoice(currentProvider as 'elevenlabs' | 'cartesia');
+      const defaultVoice = config.getDefaultVoice(currentProvider as 'elevenlabs' | 'cartesia' | 'xtts');
       if (defaultVoice) {
         console.log(`Default voice: ${defaultVoice}`);
       } else {
@@ -146,7 +150,11 @@ program
       }
       console.log(''); // Empty line for spacing
 
-      const provider = await ProviderFactory.createProvider(providerType, { apiKey });
+      let providerConfig: any = { apiKey };
+      if (providerType === 'xtts') {
+        providerConfig.serverUrl = config.getXTTSServerUrl();
+      }
+      const provider = await ProviderFactory.createProvider(providerType, providerConfig);
       const allVoices = await provider.listVoices();
       
       // Filter voices based on the --all flag
@@ -158,6 +166,9 @@ program
         } else if (providerType === 'elevenlabs') {
           // For ElevenLabs, filter to show only cloned voices (user-created)
           voices = allVoices.filter(voice => voice.labels?.category === 'cloned');
+        } else if (providerType === 'xtts') {
+          // For XTTS, show all voices as they're all custom
+          voices = allVoices;
         }
       }
 
@@ -211,16 +222,16 @@ configCommand
   .action((key, value) => {
     try {
       // Handle special cases for nested properties
-      if (key === 'ttsProvider' && !['elevenlabs', 'cartesia'].includes(value)) {
-        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia');
+      if (key === 'ttsProvider' && !['elevenlabs', 'cartesia', 'xtts'].includes(value)) {
+        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia, xtts');
         process.exit(1);
       }
       
       // Handle provider-specific default voice setting
       if (key.includes('DefaultVoice')) {
-        const match = key.match(/^(elevenlabs|cartesia)DefaultVoice$/);
+        const match = key.match(/^(elevenlabs|cartesia|xtts)DefaultVoice$/);
         if (match) {
-          const provider = match[1] as 'elevenlabs' | 'cartesia';
+          const provider = match[1] as 'elevenlabs' | 'cartesia' | 'xtts';
           config.setProviderDefaultVoice(provider, value);
           console.log(`Configuration updated: ${provider} default voice = ${value}`);
           return;
@@ -238,11 +249,11 @@ configCommand
 // Simplified commands for common operations
 configCommand
   .command('provider <provider>')
-  .description('Set default TTS provider (elevenlabs|cartesia)')
+  .description('Set default TTS provider (elevenlabs|cartesia|xtts)')
   .action((provider) => {
     try {
-      if (!['elevenlabs', 'cartesia'].includes(provider)) {
-        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia');
+      if (!['elevenlabs', 'cartesia', 'xtts'].includes(provider)) {
+        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia, xtts');
         process.exit(1);
       }
       
@@ -257,17 +268,17 @@ configCommand
 configCommand
   .command('voice <voice-id>')
   .description('Set default voice for current provider')
-  .option('-p, --provider <provider>', 'Set voice for specific provider (elevenlabs|cartesia)')
+  .option('-p, --provider <provider>', 'Set voice for specific provider (elevenlabs|cartesia|xtts)')
   .action((voiceId, options) => {
     try {
       const provider = options.provider || config.get('ttsProvider') || 'elevenlabs';
       
-      if (options.provider && !['elevenlabs', 'cartesia'].includes(options.provider)) {
-        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia');
+      if (options.provider && !['elevenlabs', 'cartesia', 'xtts'].includes(options.provider)) {
+        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia, xtts');
         process.exit(1);
       }
       
-      config.setProviderDefaultVoice(provider as 'elevenlabs' | 'cartesia', voiceId);
+      config.setProviderDefaultVoice(provider as 'elevenlabs' | 'cartesia' | 'xtts', voiceId);
       console.log(`Default voice for ${provider} set to: ${voiceId}`);
     } catch (error) {
       console.error('Error:', error);
@@ -278,15 +289,15 @@ configCommand
 // Keep the original detailed command for advanced users
 configCommand
   .command('set-default-voice <provider> <voice-id>')
-  .description('Set default voice for a specific provider (elevenlabs|cartesia)')
+  .description('Set default voice for a specific provider (elevenlabs|cartesia|xtts)')
   .action((provider, voiceId) => {
     try {
-      if (!['elevenlabs', 'cartesia'].includes(provider)) {
-        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia');
+      if (!['elevenlabs', 'cartesia', 'xtts'].includes(provider)) {
+        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia, xtts');
         process.exit(1);
       }
       
-      config.setProviderDefaultVoice(provider as 'elevenlabs' | 'cartesia', voiceId);
+      config.setProviderDefaultVoice(provider as 'elevenlabs' | 'cartesia' | 'xtts', voiceId);
       console.log(`Default voice for ${provider} set to: ${voiceId}`);
     } catch (error) {
       console.error('Error:', error);
@@ -326,7 +337,7 @@ program
         const currentProvider = config.get('ttsProvider') || 'elevenlabs';
         console.log(`Current provider: ${currentProvider}`);
         
-        const defaultVoice = config.getDefaultVoice(currentProvider as 'elevenlabs' | 'cartesia');
+        const defaultVoice = config.getDefaultVoice(currentProvider as 'elevenlabs' | 'cartesia' | 'xtts');
         if (defaultVoice) {
           console.log(`Default voice for ${currentProvider}: ${defaultVoice}`);
         } else {
@@ -335,8 +346,8 @@ program
         return;
       }
       
-      if (!['elevenlabs', 'cartesia'].includes(provider)) {
-        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia');
+      if (!['elevenlabs', 'cartesia', 'xtts'].includes(provider)) {
+        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia, xtts');
         process.exit(1);
       }
       
@@ -364,12 +375,12 @@ program
     try {
       const provider = options.provider || config.get('ttsProvider') || 'elevenlabs';
       
-      if (options.provider && !['elevenlabs', 'cartesia'].includes(options.provider)) {
-        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia');
+      if (options.provider && !['elevenlabs', 'cartesia', 'xtts'].includes(options.provider)) {
+        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia, xtts');
         process.exit(1);
       }
       
-      config.setProviderDefaultVoice(provider as 'elevenlabs' | 'cartesia', voiceId);
+      config.setProviderDefaultVoice(provider as 'elevenlabs' | 'cartesia' | 'xtts', voiceId);
       console.log(`✅ Default voice for ${provider} set to: ${voiceId}`);
     } catch (error) {
       console.error('Error:', error);

@@ -1,6 +1,6 @@
 # saym - Say iMproved
 
-A powerful text-to-speech command-line tool that extends the traditional `say` command with advanced voice synthesis capabilities using ElevenLabs and Cartesia APIs. Create custom voice models from your own voice and speak in multiple languages with natural-sounding output.
+A powerful text-to-speech command-line tool that extends the traditional `say` command with advanced voice synthesis capabilities using ElevenLabs, Cartesia, and XTTS v2 APIs. Create custom voice models from your own voice and speak in multiple languages with natural-sounding output.
 
 ## Live Demo (with Audio)
 
@@ -16,7 +16,7 @@ This video demonstrates saym reading its own command description using ElevenLab
 - 💬 **Simple CLI Interface**: Easy-to-use command-line interface similar to the native `say` command
 - 🔊 **Audio Output Options**: Save to file or play directly through speakers
 - 🎛️ **Voice Customization**: High-quality voice synthesis with provider-optimized settings
-- 🔄 **Multiple Providers**: Support for both ElevenLabs and Cartesia TTS APIs
+- 🔄 **Multiple Providers**: Support for ElevenLabs, Cartesia, and XTTS v2 TTS APIs
 
 ## Installation
 
@@ -34,6 +34,9 @@ npm run build
 # Set up your API keys (at least one is required)
 export ELEVENLABS_API_KEY="your-elevenlabs-api-key"
 export CARTESIA_API_KEY="your-cartesia-api-key"
+# For XTTS v2 (optional, defaults to 'none' for no auth)
+export XTTS_API_KEY="your-xtts-api-key"
+export XTTS_SERVER_URL="http://localhost:8020"  # Optional, defaults to localhost:8020
 ```
 
 ### Running saym
@@ -91,6 +94,9 @@ saym -v "voice-id" -l ja "今日は良い天気ですね"
 # Use Cartesia provider instead of default ElevenLabs
 saym -p cartesia -v "694f9389-aac1-45b6-b726-9d9369183238" "Hello from Cartesia!"
 
+# Use XTTS v2 provider (requires XTTS server running)
+saym -p xtts -v "voice.wav" "Hello from XTTS v2!"
+
 # Read from file
 saym -f input.txt
 
@@ -109,6 +115,7 @@ saym voices
 
 # List voices from a specific provider
 saym voices -p cartesia
+saym voices -p xtts
 
 # List all public voices (including pre-made voices)
 saym voices --all
@@ -137,6 +144,7 @@ saym --format wav -o output.wav "Save as WAV file"
 saym config show                        # Show current configuration
 saym use elevenlabs                     # Switch to ElevenLabs (simple!)
 saym use cartesia                       # Switch to Cartesia (simple!)
+saym use xtts                          # Switch to XTTS v2 (simple!)
 saym default-voice <voice-id>           # Set default voice for current provider
 saym default-voice <voice-id> -p cartesia # Set default voice for specific provider
 
@@ -151,10 +159,11 @@ saym providers
 
 ### Using Custom Voice Models
 
-To create custom voice models, use the ElevenLabs or Cartesia web interfaces:
+To create custom voice models, use the respective web interfaces:
 
 - **ElevenLabs**: Visit [ElevenLabs Voice Lab](https://elevenlabs.io/voice-lab) to create and train custom voices
 - **Cartesia**: Visit [Cartesia](https://cartesia.ai/) to access voice cloning features
+- **XTTS v2**: Use your own voice samples (.wav files) directly with the XTTS server
 
 Once you have created a custom voice through these services, you can use it with saym:
 
@@ -185,6 +194,11 @@ Create a `.saymrc` file in your home directory for default settings:
     "cartesia": {
       "apiKey": "optional-if-not-in-env",
       "defaultVoice": "cartesia-specific-voice-id"
+    },
+    "xtts": {
+      "apiKey": "optional-if-not-in-env",
+      "serverUrl": "http://localhost:8020",
+      "defaultVoice": "voice.wav"
     }
   }
 }
@@ -205,6 +219,9 @@ saym use elevenlabs
 
 # Or set Cartesia as default (ultra-low latency, cost-effective)
 saym use cartesia
+
+# Or set XTTS v2 as default (self-hosted, no API costs)
+saym use xtts
 ```
 
 #### Step 2: Find Available Voices
@@ -216,6 +233,7 @@ saym voices
 # List voices for a specific provider
 saym voices -p elevenlabs
 saym voices -p cartesia
+saym voices -p xtts
 
 # List ALL voices (including public ones)
 saym voices --all
@@ -231,6 +249,7 @@ saym default-voice "21m00Tcm4TlvDq8ikWAM"
 # Or set for specific provider
 saym default-voice "694f9389-aac1-45b6-b726-9d9369183238" -p cartesia
 saym default-voice "21m00Tcm4TlvDq8ikWAM" -p elevenlabs
+saym default-voice "voice.wav" -p xtts
 
 # Optional: Set global fallback voice (advanced)
 saym config set defaultVoice "some-voice-id"
@@ -292,6 +311,21 @@ saym default-voice "your-voice-id"
 saym "This uses my Cartesia default voice"
 ```
 
+**For XTTS v2 users (self-hosted):**
+```bash
+# 1. Switch to XTTS v2
+saym use xtts
+
+# 2. List available voice files
+saym voices
+
+# 3. Set your voice file as default
+saym default-voice "voice.wav"
+
+# 4. Test
+saym "This uses my XTTS v2 voice"
+```
+
 **For users with both providers:**
 ```bash
 # Set default provider
@@ -309,14 +343,15 @@ saym -p elevenlabs "Uses ElevenLabs with its default voice"
 ## Requirements
 
 - Node.js 18+ or Deno
-- At least one TTS provider API key:
+- At least one TTS provider:
   - ElevenLabs API account and API key, OR
-  - Cartesia API account and API key
+  - Cartesia API account and API key, OR
+  - XTTS v2 server running locally or remotely
 - FFmpeg (for audio format conversions)
 
 ## API Key Setup
 
-You can use either ElevenLabs or Cartesia (or both). Here's how to set up each:
+You can use ElevenLabs, Cartesia, or XTTS v2 (or all). Here's how to set up each:
 
 ### ElevenLabs Setup
 
@@ -347,6 +382,33 @@ You can use either ElevenLabs or Cartesia (or both). Here's how to set up each:
 2. Navigate to API keys section
 3. Generate and copy your API key
 
+### XTTS v2 Setup
+
+#### 1. Install and Run XTTS v2 Server
+
+XTTS v2 requires a server running either locally or remotely. You can use the Coqui TTS server:
+
+```bash
+# Install Coqui TTS
+pip install TTS
+
+# Run the server (default port 8020)
+tts-server --model_name tts_models/multilingual/multi-dataset/xtts_v2
+
+# Or run with custom port
+tts-server --model_name tts_models/multilingual/multi-dataset/xtts_v2 --port 8080
+```
+
+#### 2. Configure XTTS Connection
+
+```bash
+# Set server URL (optional, defaults to localhost:8020)
+export XTTS_SERVER_URL="http://localhost:8020"
+
+# Set API key if authentication is required (optional)
+export XTTS_API_KEY="your-api-key"  # or "none" for no auth
+```
+
 ### 3. Verify API Keys
 
 Test your API key setup:
@@ -355,12 +417,16 @@ Test your API key setup:
 # Check if environment variables are set
 echo $ELEVENLABS_API_KEY
 echo $CARTESIA_API_KEY
+echo $XTTS_SERVER_URL
 
 # Test with saym (ElevenLabs)
 saym voices
 
 # Test with saym (Cartesia)
 saym voices -p cartesia
+
+# Test with saym (XTTS v2)
+saym voices -p xtts
 ```
 
 ## License

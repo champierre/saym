@@ -2,14 +2,14 @@
 
 ## Project Overview
 
-saym (Say iMproved) is a CLI tool that extends the traditional `say` command with advanced text-to-speech capabilities using multiple TTS providers (ElevenLabs and Cartesia).
+saym (Say iMproved) is a CLI tool that extends the traditional `say` command with advanced text-to-speech capabilities using multiple TTS providers (ElevenLabs, Cartesia, and XTTS v2).
 
 ## Key Project Information
 
 ### Technology Stack
 - **Runtime**: Node.js 18+ or Deno
 - **Language**: TypeScript
-- **APIs**: ElevenLabs and Cartesia Text-to-Speech APIs
+- **APIs**: ElevenLabs, Cartesia, and XTTS v2 Text-to-Speech APIs
 - **Audio Processing**: FFmpeg
 
 ### Project Structure
@@ -21,6 +21,7 @@ saym/
 │   │   ├── tts-provider.ts     # Provider interface
 │   │   ├── elevenlabs-provider.ts # ElevenLabs integration
 │   │   ├── cartesia-provider.ts   # Cartesia integration
+│   │   ├── xtts-provider.ts      # XTTS v2 integration
 │   │   └── provider-factory.ts    # Provider factory
 │   ├── voice-manager.ts    # Voice model management
 │   ├── audio.ts           # Audio playback and file handling
@@ -117,6 +118,13 @@ try {
 - Multiple audio formats supported
 - Rate limiting varies by plan
 
+### XTTS v2 API
+- Self-hosted TTS server
+- Supports multilingual synthesis
+- Voice cloning capabilities
+- Requires local or remote server instance
+- Default server URL: http://localhost:8020
+
 
 ## Common Development Tasks
 
@@ -182,9 +190,10 @@ try {
 ## Debugging Tips
 
 ### Common Issues
-1. **API Key Issues**: Check environment variable is set (ELEVENLABS_API_KEY or CARTESIA_API_KEY)
+1. **API Key Issues**: Check environment variable is set (ELEVENLABS_API_KEY, CARTESIA_API_KEY, or XTTS_API_KEY)
 2. **Audio Playback**: Verify FFmpeg is installed
 3. **Provider Selection**: Ensure correct provider is specified with -p flag
+5. **XTTS Server**: Verify server is running at the configured URL (default: http://localhost:8020)
 4. **Network Issues**: Implement proper timeout handling
 
 ### Debug Mode
