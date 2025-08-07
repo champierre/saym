@@ -27,6 +27,9 @@ saym/
 │   ├── audio.ts           # Audio playback and file handling
 │   ├── config.ts          # Configuration management
 │   └── types.ts           # TypeScript type definitions
+├── docs/                   # Documentation
+│   ├── XTTS_SETUP.md          # Complete XTTS v2 setup guide
+│   └── XTTS_QUICKSTART.md     # 5-minute XTTS v2 quickstart
 ├── tests/
 │   ├── unit/
 │   └── integration/

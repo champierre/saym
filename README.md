@@ -10,6 +10,11 @@ Here's a video example of saym in action with audio output:
 
 This video demonstrates saym reading its own command description using ElevenLabs' high-quality voice synthesis engine. Turn on your audio to hear the synthesized speech!
 
+## 📚 Documentation
+
+- [🚀 XTTS v2 Quick Start](./docs/XTTS_QUICKSTART.md) - Get XTTS running in 5 minutes
+- [📖 XTTS v2 Setup Guide](./docs/XTTS_SETUP.md) - Complete XTTS installation and configuration
+
 ## Features
 
 - 🎯 **High-Quality Synthesis**: Leverage advanced AI voice synthesis from multiple providers
@@ -384,30 +389,27 @@ You can use ElevenLabs, Cartesia, or XTTS v2 (or all). Here's how to set up each
 
 ### XTTS v2 Setup
 
-#### 1. Install and Run XTTS v2 Server
+XTTS v2 is a self-hosted TTS system with voice cloning capabilities.
 
-XTTS v2 requires a server running either locally or remotely. You can use the Coqui TTS server:
+📚 **Setup Guides:**
+- [🚀 Quick Start Guide](./docs/XTTS_QUICKSTART.md) - Get started in 5 minutes
+- [📖 Detailed Setup Guide](./docs/XTTS_SETUP.md) - Complete installation and configuration
+
+#### Quick Installation
 
 ```bash
 # Install Coqui TTS
 pip install TTS
 
-# Run the server (default port 8020)
+# Run the server
 tts-server --model_name tts_models/multilingual/multi-dataset/xtts_v2
 
-# Or run with custom port
-tts-server --model_name tts_models/multilingual/multi-dataset/xtts_v2 --port 8080
-```
-
-#### 2. Configure XTTS Connection
-
-```bash
-# Set server URL (optional, defaults to localhost:8020)
+# Configure connection
 export XTTS_SERVER_URL="http://localhost:8020"
-
-# Set API key if authentication is required (optional)
-export XTTS_API_KEY="your-api-key"  # or "none" for no auth
+export XTTS_API_KEY="none"
 ```
+
+For detailed instructions, troubleshooting, and advanced configuration, see the [XTTS Setup Guide](./docs/XTTS_SETUP.md).
 
 ### 3. Verify API Keys
 
