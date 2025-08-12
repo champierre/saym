@@ -31,7 +31,9 @@ XTTS v2では、あなたの声をクローンするために6-10秒程度の音
 # macOSの場合（コマンドラインで録音）
 # 1. QuickTime Playerで録音
 open -a "QuickTime Player"
-# 新規オーディオ録音 > 録音 > 6-10秒間話す > 停止 > voice.wavとして保存
+# 新規オーディオ録音 > 録音 > 6-10秒間話す > 停止 > voice.m4aとして保存
+# m4aからwavに変換
+ffmpeg -i voice.m4a -ar 22050 -ac 1 voice.wav
 
 # 2. または sox コマンドで録音（事前にbrew install soxが必要）
 sox -d -r 22050 -c 1 voice.wav trim 0 10
