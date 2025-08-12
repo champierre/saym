@@ -14,7 +14,7 @@ pip install TTS flask flask-cors
 
 # 3. For Japanese language support (optional)
 pip install "fugashi[unidic]"
-python -c "import unidic; unidic.download()"
+python -m unidic download
 
 # 4. Download custom server script
 curl -o ~/python/xtts_server.py https://raw.githubusercontent.com/champierre/saym/main/scripts/xtts_server.py
@@ -81,7 +81,7 @@ If you encounter errors when using Japanese text with XTTS, install the required
 ```bash
 # Install Japanese text processing libraries
 pip install "fugashi[unidic]"
-python -c "import unidic; unidic.download()"
+python -m unidic download
 
 # For macOS users, you may also need MeCab
 brew install mecab mecab-ipadic
