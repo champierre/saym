@@ -94,9 +94,16 @@ export class ConfigManager {
   }
 
   /**
+   * Get CoeFont access secret from environment or config
+   */
+  getCoeFontAccessSecret(): string | undefined {
+    return process.env.COEFONT_ACCESS_SECRET || this.config.providers?.coefont?.accessSecret;
+  }
+
+  /**
    * Get API key from environment or config
    */
-  getApiKey(provider?: 'elevenlabs' | 'cartesia' | 'xtts'): string | undefined {
+  getApiKey(provider?: 'elevenlabs' | 'cartesia' | 'xtts' | 'coefont'): string | undefined {
     const ttsProvider = provider || this.config.ttsProvider || 'elevenlabs';
     
     switch (ttsProvider) {
@@ -106,6 +113,8 @@ export class ConfigManager {
         return process.env.CARTESIA_API_KEY || this.config.providers?.cartesia?.apiKey;
       case 'xtts':
         return process.env.XTTS_API_KEY || this.config.providers?.xtts?.apiKey || 'none';
+      case 'coefont':
+        return process.env.COEFONT_ACCESS_KEY || this.config.providers?.coefont?.accessKey;
       default:
         return undefined;
     }
@@ -114,7 +123,7 @@ export class ConfigManager {
   /**
    * Get default voice for a specific provider
    */
-  getDefaultVoice(provider?: 'elevenlabs' | 'cartesia' | 'xtts'): string | undefined {
+  getDefaultVoice(provider?: 'elevenlabs' | 'cartesia' | 'xtts' | 'coefont'): string | undefined {
     const ttsProvider = provider || this.config.ttsProvider || 'elevenlabs';
     
     // First check provider-specific default voice
@@ -134,6 +143,11 @@ export class ConfigManager {
           return this.config.providers.xtts.defaultVoice;
         }
         break;
+      case 'coefont':
+        if (this.config.providers?.coefont?.defaultVoice) {
+          return this.config.providers.coefont.defaultVoice;
+        }
+        break;
     }
     
     // Fallback to global default voice
@@ -143,7 +157,7 @@ export class ConfigManager {
   /**
    * Set default voice for a specific provider
    */
-  setProviderDefaultVoice(provider: 'elevenlabs' | 'cartesia' | 'xtts', voiceId: string): void {
+  setProviderDefaultVoice(provider: 'elevenlabs' | 'cartesia' | 'xtts' | 'coefont', voiceId: string): void {
     if (!this.config.providers) {
       this.config.providers = {};
     }

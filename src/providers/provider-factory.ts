@@ -2,8 +2,9 @@ import { TTSProvider, TTSProviderConfig } from './tts-provider';
 import { ElevenLabsProvider } from './elevenlabs-provider';
 import { CartesiaProvider } from './cartesia-provider';
 import { XTTSProvider } from './xtts-provider';
+import { CoeFontProvider } from './coefont-provider';
 
-export type ProviderType = 'elevenlabs' | 'cartesia' | 'xtts';
+export type ProviderType = 'elevenlabs' | 'cartesia' | 'xtts' | 'coefont';
 
 export class ProviderFactory {
   private static providers: Map<string, TTSProvider> = new Map();
@@ -27,6 +28,9 @@ export class ProviderFactory {
       case 'xtts':
         provider = new XTTSProvider();
         break;
+      case 'coefont':
+        provider = new CoeFontProvider();
+        break;
       default:
         throw new Error(`Unknown provider type: ${type}`);
     }
@@ -46,6 +50,6 @@ export class ProviderFactory {
   }
 
   static getSupportedProviders(): ProviderType[] {
-    return ['elevenlabs', 'cartesia', 'xtts'];
+    return ['elevenlabs', 'cartesia', 'xtts', 'coefont'];
   }
 }
