@@ -12,11 +12,15 @@ source ~/python/xtts-env/bin/activate
 # 2. Install required packages
 pip install TTS flask flask-cors
 
-# 3. Download custom server script
+# 3. For Japanese language support (optional)
+pip install "fugashi[unidic]"
+python -c "import unidic; unidic.download()"
+
+# 4. Download custom server script
 curl -o ~/python/xtts_server.py https://raw.githubusercontent.com/champierre/saym/main/scripts/xtts_server.py
 # Or use the xtts_server.py created above
 
-# 4. Start server (downloads model automatically on first run)
+# 5. Start server (downloads model automatically on first run)
 python3 ~/python/xtts_server.py --port 8020
 
 # Check server health in another terminal
@@ -59,8 +63,42 @@ export XTTS_SERVER_URL="http://localhost:8020"
 # Synthesize speech with XTTS
 saym -p xtts -v "voice.wav" "Hello, this is XTTS v2 test"
 
+# For Japanese text
+saym -p xtts -v "voice.wav" -l ja "こんにちは、これはXTTS v2のテストです"
+
 # Set as default and use
 saym use xtts
 saym default-voice "voice.wav"
 saym "Now it's easy to use"
 ```
+
+## Troubleshooting
+
+### Japanese Text Processing Issues
+
+If you encounter errors when using Japanese text with XTTS, install the required Japanese processing libraries:
+
+```bash
+# Install Japanese text processing libraries
+pip install "fugashi[unidic]"
+python -c "import unidic; unidic.download()"
+
+# For macOS users, you may also need MeCab
+brew install mecab mecab-ipadic
+
+# Set MeCab environment variable if needed
+export MECABRC=/usr/local/etc/mecabrc
+```
+
+Common error messages and solutions:
+- `No module named 'cutlet'` → Install: `pip install cutlet`
+- `No module named 'fugashi'` → Install: `pip install "fugashi[unidic]"`
+- `Failed initializing MeCab` → Install MeCab via Homebrew as shown above
+
+### Supported Languages
+
+XTTS v2 supports the following language codes:
+- `en` (English), `ja` (Japanese), `es` (Spanish), `fr` (French)
+- `de` (German), `it` (Italian), `pt` (Portuguese), `pl` (Polish)
+- `tr` (Turkish), `ru` (Russian), `nl` (Dutch), `cs` (Czech)
+- `ar` (Arabic), `zh-cn` (Chinese), `hu` (Hungarian), `ko` (Korean), `hi` (Hindi)
