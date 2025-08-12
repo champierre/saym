@@ -85,10 +85,13 @@ program
 
       console.log(`Speaking with ${providerType} voice: ${voiceId}`);
 
+      // Determine the correct audio format based on provider
+      const audioFormat = providerType === 'xtts' ? 'wav' : options.format;
+
       if (options.stream) {
         // Stream mode
         const stream = await provider.textToSpeechStream(inputText, voiceId, { 
-          outputFormat: options.format,
+          outputFormat: audioFormat,
           language: options.language
         });
         
@@ -99,12 +102,12 @@ program
           await pipeline(stream, writeStream);
           console.log(`Audio saved to: ${options.output}`);
         } else {
-          await audioPlayer.playStream(stream, options.format);
+          await audioPlayer.playStream(stream, audioFormat);
         }
       } else {
         // Buffer mode
         const audio = await provider.textToSpeech(inputText, voiceId, { 
-          outputFormat: options.format,
+          outputFormat: audioFormat,
           language: options.language
         });
         
@@ -112,7 +115,7 @@ program
           fs.writeFileSync(options.output, audio);
           console.log(`Audio saved to: ${options.output}`);
         } else {
-          await audioPlayer.playAudio(audio, options.format);
+          await audioPlayer.playAudio(audio, audioFormat);
         }
       }
 

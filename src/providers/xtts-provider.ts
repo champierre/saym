@@ -38,22 +38,16 @@ export class XTTSProvider implements TTSProvider {
 
   async textToSpeech(text: string, voiceId: string, options?: TTSOptions): Promise<Buffer> {
     try {
-      const formData = new FormData();
-      formData.append('text', text);
-      formData.append('speaker_wav', voiceId);
-      
-      if (options?.language) {
-        formData.append('language', options.language);
-      } else {
-        formData.append('language', 'en');
-      }
-
       const response = await this.client.post(
-        '/tts_to_audio',
-        formData,
+        '/api/tts',
+        {
+          text: text,
+          speaker_wav: voiceId,
+          language: options?.language || 'en'
+        },
         {
           headers: {
-            ...formData.getHeaders(),
+            'Content-Type': 'application/json',
           },
           responseType: 'arraybuffer',
           maxContentLength: Infinity,
@@ -107,30 +101,16 @@ export class XTTSProvider implements TTSProvider {
   }
 
   async listVoices(): Promise<TTSVoice[]> {
-    try {
-      const response = await this.client.get('/speakers');
-      
-      if (Array.isArray(response.data)) {
-        return response.data.map((speaker: string) => ({
-          id: speaker,
-          name: speaker,
-          description: `XTTS v2 voice: ${speaker}`,
-          provider: this.name,
-          labels: {},
-          languages: ['en', 'es', 'fr', 'de', 'it', 'pt', 'pl', 'tr', 'ru', 'nl', 'cs', 'ar', 'zh-cn', 'ja', 'hu', 'ko', 'hi'],
-        }));
-      }
-      
-      return [];
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.code === 'ECONNREFUSED') {
-          throw new TTSProviderError(this.name, `XTTS server not running at ${this.serverUrl}`);
-        }
-        throw new TTSProviderError(this.name, `Failed to list voices: ${error.message}`);
-      }
-      throw error;
-    }
+    // XTTS v2 uses custom voice files, not predefined voices
+    // Return a placeholder indicating that custom voice files are required
+    return [{
+      id: 'custom',
+      name: 'Custom Voice (provide .wav file)',
+      description: 'XTTS v2 requires a speaker WAV file for voice cloning',
+      provider: this.name,
+      labels: {},
+      languages: ['en', 'es', 'fr', 'de', 'it', 'pt', 'pl', 'tr', 'ru', 'nl', 'cs', 'ar', 'zh-cn', 'ja', 'hu', 'ko', 'hi'],
+    }];
   }
 
   async getVoice(voiceId: string): Promise<TTSVoice | null> {
@@ -148,7 +128,7 @@ export class XTTSProvider implements TTSProvider {
 
   async validateConnection(): Promise<boolean> {
     try {
-      await this.client.get('/docs');
+      await this.client.get('/health');
       return true;
     } catch (error) {
       return false;
