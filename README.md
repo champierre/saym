@@ -10,10 +10,6 @@ Here's a video example of saym in action with audio output:
 
 This video demonstrates saym reading its own command description using ElevenLabs' high-quality voice synthesis engine. Turn on your audio to hear the synthesized speech!
 
-## 📚 Documentation
-
-- [📖 XTTS v2 Setup Guide](./docs/XTTS_SETUP.md) - Complete XTTS v2 installation and setup
-
 ## Features
 
 - 🎯 **High-Quality Synthesis**: Leverage advanced AI voice synthesis from multiple providers
