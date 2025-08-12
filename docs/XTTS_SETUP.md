@@ -31,16 +31,16 @@ XTTS v2では、あなたの声をクローンするために6-10秒程度の音
 # macOSの場合（コマンドラインで録音）
 # 1. QuickTime Playerで録音
 open -a "QuickTime Player"
-# 新規オーディオ録音 > 録音 > 6-10秒間話す > 停止 > voice.wavとして~/python/に保存
+# 新規オーディオ録音 > 録音 > 6-10秒間話す > 停止 > voice.wavとして保存
 
 # 2. または sox コマンドで録音（事前にbrew install soxが必要）
-sox -d -r 22050 -c 1 ~/python/voice.wav trim 0 10
+sox -d -r 22050 -c 1 voice.wav trim 0 10
 
 # Linuxの場合（arecord使用）
-arecord -f cd -t wav -d 10 ~/python/voice.wav
+arecord -f cd -t wav -d 10 voice.wav
 
 # 既存の音声ファイルを使用する場合（適切な形式に変換）
-ffmpeg -i your_voice_file.mp3 -ar 22050 -ac 1 ~/python/voice.wav
+ffmpeg -i your_voice_file.mp3 -ar 22050 -ac 1 voice.wav
 ```
 
 **録音のコツ：**
@@ -56,11 +56,11 @@ export XTTS_SERVER_URL="http://localhost:8020"
 export XTTS_API_KEY="none"
 
 # XTTSで音声合成
-saym -p xtts -v "~/python/voice.wav" "こんにちは、XTTS v2のテストです"
+saym -p xtts -v "voice.wav" "こんにちは、XTTS v2のテストです"
 
 # デフォルトに設定して使用
 saym use xtts
-saym default-voice "~/python/voice.wav"
+saym default-voice "voice.wav"
 saym "これで簡単に使えます"
 ```
 
