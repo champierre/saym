@@ -12,8 +12,8 @@ This video demonstrates saym reading its own command description using ElevenLab
 
 ## 📚 Documentation
 
-- [🚀 XTTS v2 Quick Start](./docs/XTTS_QUICKSTART.md) - Get XTTS running in 5 minutes
-- [📖 XTTS v2 Setup Guide](./docs/XTTS_SETUP.md) - Complete XTTS installation and configuration
+- [📖 XTTS v2 Setup Guide](./docs/XTTS_SETUP.md) - Complete XTTS v2 installation and setup
+- [📖 XTTS v2 セットアップガイド (日本語)](./docs/XTTS_SETUP.ja.md) - XTTS v2のインストールとセットアップ
 
 ## Features
 

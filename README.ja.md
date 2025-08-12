@@ -10,6 +10,11 @@
 
 この動画では、saymコマンドの説明文をElevenLabsの高品質な音声合成エンジンを使って読み上げています。音声をオンにして合成音声をお聞きください！
 
+## 📚 ドキュメント
+
+- [📖 XTTS v2 Setup Guide (English)](./docs/XTTS_SETUP.md) - Complete XTTS v2 installation and setup
+- [📖 XTTS v2 セットアップガイド](./docs/XTTS_SETUP.ja.md) - XTTS v2のインストールとセットアップ
+
 ## 機能
 
 - 🎯 **高品質合成**: 複数のプロバイダーの高度なAI音声合成を活用

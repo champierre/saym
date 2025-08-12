@@ -1,68 +1,67 @@
-# XTTS v2 セットアップガイド
+# XTTS v2 Setup Guide
 
-XTTS v2は、Coqui AIが開発した高品質な多言語音声合成システムです。自分のサーバーで動作させることができ、APIコストなしで利用できます。
+XTTS v2 is a high-quality multilingual text-to-speech system developed by Coqui AI. It can run on your own server and is available at no API cost.
 
-## 動作確認済みの方法（macOS/Linux）
+## Verified Method (macOS/Linux)
 
 ```bash
-# 1. Python仮想環境を作成して有効化
+# 1. Create and activate Python virtual environment
 python3 -m venv ~/python/xtts-env
 source ~/python/xtts-env/bin/activate
 
-# 2. 必要なパッケージをインストール
+# 2. Install required packages
 pip install TTS flask flask-cors
 
-# 3. カスタムサーバースクリプトをダウンロード
+# 3. Download custom server script
 curl -o ~/python/xtts_server.py https://raw.githubusercontent.com/champierre/saym/main/scripts/xtts_server.py
-# または、上記で作成したxtts_server.pyを使用
+# Or use the xtts_server.py created above
 
-# 4. サーバーを起動（初回はモデルを自動ダウンロード）
+# 4. Start server (downloads model automatically on first run)
 python3 ~/python/xtts_server.py --port 8020
 
-# 別ターミナルで動作確認
+# Check server health in another terminal
 curl http://localhost:8020/health
 ```
 
-## 2. 音声サンプル準備
+## 2. Voice Sample Preparation
 
-XTTS v2では、あなたの声をクローンするために6-10秒程度の音声サンプルが必要です。以下の方法で録音してください：
+XTTS v2 requires a 6-10 second voice sample to clone your voice. Record using one of the following methods:
 
 ```bash
-# macOSの場合（コマンドラインで録音）
-# 1. QuickTime Playerで録音
+# macOS (command-line recording)
+# 1. Record with QuickTime Player
 open -a "QuickTime Player"
-# 新規オーディオ録音 > 録音 > 6-10秒間話す > 停止 > voice.m4aとして保存
-# m4aからwavに変換
+# New Audio Recording > Record > Speak for 6-10 seconds > Stop > Save as voice.m4a
+# Convert m4a to wav
 ffmpeg -i voice.m4a -ar 22050 -ac 1 voice.wav
 
-# 2. または sox コマンドで録音（事前にbrew install soxが必要）
+# 2. Or record with sox command (requires: brew install sox)
 sox -d -r 22050 -c 1 voice.wav trim 0 10
 
-# Linuxの場合（arecord使用）
+# Linux (using arecord)
 arecord -f cd -t wav -d 10 voice.wav
 
-# 既存の音声ファイルを使用する場合（適切な形式に変換）
+# Convert existing audio file to proper format
 ffmpeg -i your_voice_file.mp3 -ar 22050 -ac 1 voice.wav
 ```
 
-**録音のコツ：**
-- はっきりと話す（6-10秒程度）
-- 背景ノイズを避ける
-- 自然な口調で話す
+**Recording Tips:**
+- Speak clearly (6-10 seconds duration)
+- Avoid background noise
+- Use natural tone
 
-## 3. saymで使用
+## 3. Using with saym
 
 ```bash
-# 環境変数を設定
+# Set environment variables
 export XTTS_SERVER_URL="http://localhost:8020"
 export XTTS_API_KEY="none"
 
-# XTTSで音声合成
-saym -p xtts -v "voice.wav" "こんにちは、XTTS v2のテストです"
+# Synthesize speech with XTTS
+saym -p xtts -v "voice.wav" "Hello, this is XTTS v2 test"
 
-# デフォルトに設定して使用
+# Set as default and use
 saym use xtts
 saym default-voice "voice.wav"
-saym "これで簡単に使えます"
+saym "Now it's easy to use"
 ```
-
