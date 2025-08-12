@@ -389,10 +389,7 @@ You can use ElevenLabs, Cartesia, or XTTS v2 (or all). Here's how to set up each
 
 XTTS v2 is a self-hosted TTS system with voice cloning capabilities.
 
-📚 **Setup Guides:**
-- [📖 XTTS v2 Setup Guide](./docs/XTTS_SETUP.md) - Complete installation and setup
-
-Please follow the [XTTS v2 Setup Guide](./docs/XTTS_SETUP.md) for complete installation and configuration instructions.
+Please follow the [📖 XTTS v2 Setup Guide](./docs/XTTS_SETUP.md) for complete installation and configuration instructions.
 
 ### 3. Verify API Keys
 
