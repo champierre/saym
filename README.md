@@ -91,7 +91,7 @@ saym -v "voice-id-or-name" "This is my custom voice"
 saym -v "voice-id" -l ja "今日は良い天気ですね"
 
 # Use Cartesia provider instead of default ElevenLabs
-saym -p cartesia -v "694f9389-aac1-45b6-b726-9d9369183238" "Hello from Cartesia!"
+saym -p cartesia -v "12345678-abcd-efgh-ijkl-9876543210ab" "Hello from Cartesia!"
 
 # Use XTTS v2 provider (requires XTTS server running)
 saym -p xtts -v "voice.wav" "Hello from XTTS v2!"
@@ -243,11 +243,11 @@ saym voices -p cartesia --all
 
 ```bash
 # Set default voice for current provider
-saym default-voice "21m00Tcm4TlvDq8ikWAM"
+saym default-voice "abc123def456ghi789"
 
 # Or set for specific provider
-saym default-voice "694f9389-aac1-45b6-b726-9d9369183238" -p cartesia
-saym default-voice "21m00Tcm4TlvDq8ikWAM" -p elevenlabs
+saym default-voice "12345678-abcd-efgh-ijkl-9876543210ab" -p cartesia
+saym default-voice "abc123def456ghi789" -p elevenlabs
 saym default-voice "voice.wav" -p xtts
 
 # Optional: Set global fallback voice (advanced)
