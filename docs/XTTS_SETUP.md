@@ -55,7 +55,6 @@ ffmpeg -i your_voice_file.mp3 -ar 22050 -ac 1 voice.wav
 ```bash
 # Set environment variables
 export XTTS_SERVER_URL="http://localhost:8020"
-export XTTS_API_KEY="none"
 
 # Synthesize speech with XTTS
 saym -p xtts -v "voice.wav" "Hello, this is XTTS v2 test"

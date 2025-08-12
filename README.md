@@ -38,8 +38,7 @@ npm run build
 # Set up your API keys (at least one is required)
 export ELEVENLABS_API_KEY="your-elevenlabs-api-key"
 export CARTESIA_API_KEY="your-cartesia-api-key"
-# For XTTS v2 (optional, defaults to 'none' for no auth)
-export XTTS_API_KEY="your-xtts-api-key"
+# For XTTS v2 (optional)
 export XTTS_SERVER_URL="http://localhost:8020"  # Optional, defaults to localhost:8020
 ```
 
