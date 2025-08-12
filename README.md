@@ -391,24 +391,9 @@ You can use ElevenLabs, Cartesia, or XTTS v2 (or all). Here's how to set up each
 XTTS v2 is a self-hosted TTS system with voice cloning capabilities.
 
 📚 **Setup Guides:**
-- [🚀 Quick Start Guide](./docs/XTTS_QUICKSTART.md) - Get started in 5 minutes
-- [📖 Detailed Setup Guide](./docs/XTTS_SETUP.md) - Complete installation and configuration
+- [📖 XTTS v2 Setup Guide](./docs/XTTS_SETUP.md) - Complete installation and setup
 
-#### Quick Installation
-
-```bash
-# Install Coqui TTS
-pip install TTS
-
-# Run the server
-tts-server --model_name tts_models/multilingual/multi-dataset/xtts_v2
-
-# Configure connection
-export XTTS_SERVER_URL="http://localhost:8020"
-export XTTS_API_KEY="none"
-```
-
-For detailed instructions, troubleshooting, and advanced configuration, see the [XTTS Setup Guide](./docs/XTTS_SETUP.md).
+Please follow the [XTTS v2 Setup Guide](./docs/XTTS_SETUP.md) for complete installation and configuration instructions.
 
 ### 3. Verify API Keys
 
