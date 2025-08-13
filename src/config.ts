@@ -96,7 +96,7 @@ export class ConfigManager {
   /**
    * Get API key from environment or config
    */
-  getApiKey(provider?: 'elevenlabs' | 'cartesia' | 'xtts'): string | undefined {
+  getApiKey(provider?: 'elevenlabs' | 'cartesia' | 'xtts' | 'resemble'): string | undefined {
     const ttsProvider = provider || this.config.ttsProvider || 'elevenlabs';
     
     switch (ttsProvider) {
@@ -106,6 +106,8 @@ export class ConfigManager {
         return process.env.CARTESIA_API_KEY || this.config.providers?.cartesia?.apiKey;
       case 'xtts':
         return process.env.XTTS_API_KEY || this.config.providers?.xtts?.apiKey || 'none';
+      case 'resemble':
+        return process.env.RESEMBLE_API_KEY || this.config.providers?.resemble?.apiKey;
       default:
         return undefined;
     }
@@ -114,7 +116,7 @@ export class ConfigManager {
   /**
    * Get default voice for a specific provider
    */
-  getDefaultVoice(provider?: 'elevenlabs' | 'cartesia' | 'xtts'): string | undefined {
+  getDefaultVoice(provider?: 'elevenlabs' | 'cartesia' | 'xtts' | 'resemble'): string | undefined {
     const ttsProvider = provider || this.config.ttsProvider || 'elevenlabs';
     
     // First check provider-specific default voice
@@ -134,6 +136,11 @@ export class ConfigManager {
           return this.config.providers.xtts.defaultVoice;
         }
         break;
+      case 'resemble':
+        if (this.config.providers?.resemble?.defaultVoice) {
+          return this.config.providers.resemble.defaultVoice;
+        }
+        break;
     }
     
     // Fallback to global default voice
@@ -143,7 +150,7 @@ export class ConfigManager {
   /**
    * Set default voice for a specific provider
    */
-  setProviderDefaultVoice(provider: 'elevenlabs' | 'cartesia' | 'xtts', voiceId: string): void {
+  setProviderDefaultVoice(provider: 'elevenlabs' | 'cartesia' | 'xtts' | 'resemble', voiceId: string): void {
     if (!this.config.providers) {
       this.config.providers = {};
     }
