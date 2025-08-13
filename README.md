@@ -1,6 +1,6 @@
 # saym - Say iMproved
 
-A powerful text-to-speech command-line tool that extends the traditional `say` command with advanced voice synthesis capabilities using ElevenLabs, Cartesia, XTTS v2, and Resemble AI APIs. Create custom voice models from your own voice and speak in multiple languages with natural-sounding output.
+A powerful text-to-speech command-line tool that extends the traditional `say` command with advanced voice synthesis capabilities using multiple AI-powered TTS providers. Create custom voice models from your own voice and speak in multiple languages with natural-sounding output.
 
 ## Live Demo (with Audio)
 
@@ -16,7 +16,7 @@ This video demonstrates saym reading its own command description using ElevenLab
 - 💬 **Simple CLI Interface**: Easy-to-use command-line interface similar to the native `say` command
 - 🔊 **Audio Output Options**: Save to file or play directly through speakers
 - 🎛️ **Voice Customization**: High-quality voice synthesis with provider-optimized settings
-- 🔄 **Multiple Providers**: Support for ElevenLabs, Cartesia, XTTS v2, and Resemble AI TTS APIs
+- 🔄 **Multiple Providers**: Support for multiple industry-leading TTS APIs with easy provider switching
 
 ## Installation
 
