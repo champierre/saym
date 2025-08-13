@@ -33,6 +33,9 @@ coverage/
 .cache/
 .saym-cache/
 
+# Serena directory
+.serena/
+
 # Temporary files
 *.tmp
 temp/

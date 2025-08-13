@@ -15,7 +15,7 @@ export class ResembleProvider implements TTSProvider {
 
   async listVoices(): Promise<TTSVoice[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/voices`, {
+      const response = await fetch(`https://app.resemble.ai/api/v2/voices?page=1&page_size=100`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
@@ -36,10 +36,13 @@ export class ResembleProvider implements TTSProvider {
           description: voice.description || '',
           provider: 'resemble',
           labels: {
-            language: voice.language || 'en',
+            language: voice.default_language || 'en',
             gender: voice.gender,
             use_case: voice.use_case,
-            is_owner: voice.is_owner || false,
+            voice_type: voice.voice_type,
+            source: voice.source,
+            // User-owned voices have empty source OR "Custom Voice"
+            is_owner: !voice.source || voice.source === '' || voice.source === 'Custom Voice',
           },
         }));
       }
@@ -135,7 +138,7 @@ export class ResembleProvider implements TTSProvider {
 
   async validateConnection(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseUrl}/voices`, {
+      const response = await fetch(`https://app.resemble.ai/api/v2/voices?page=1&page_size=100`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,

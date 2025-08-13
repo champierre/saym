@@ -71,16 +71,24 @@ program
         process.exit(1);
       }
 
-      // If voice looks like a name instead of ID, try to find it
-      if (voiceId.length < 15 && !/^[A-Za-z0-9-]{15,}$/.test(voiceId)) {
-        const voices = await provider.listVoices();
-        const voice = voices.find(v => v.name.toLowerCase() === voiceId.toLowerCase());
-        if (voice) {
-          voiceId = voice.id;
-        } else {
-          console.error(`Error: Voice "${voiceId}" not found.`);
-          process.exit(1);
+      // First, check if the voice ID exists as-is
+      const voices = await provider.listVoices();
+      let voiceExists = voices.find(v => v.id === voiceId);
+      
+      // If not found by ID, try to find by name
+      if (!voiceExists) {
+        const voiceByName = voices.find(v => v.name.toLowerCase() === voiceId.toLowerCase());
+        if (voiceByName) {
+          voiceId = voiceByName.id;
+          voiceExists = voiceByName;
         }
+      }
+      
+      if (!voiceExists) {
+        console.error(`Error: Voice "${voiceId}" not found.`);
+        console.error(`Available voices for ${providerType}:`);
+        voices.forEach(v => console.error(`  - ${v.id}: ${v.name}`));
+        process.exit(1);
       }
 
       console.log(`Speaking with ${providerType} voice: ${voiceId}`);
@@ -173,8 +181,8 @@ program
           // For XTTS, show all voices as they're all custom
           voices = allVoices;
         } else if (providerType === 'resemble') {
-          // For Resemble, show all voices as they're all custom
-          voices = allVoices;
+          // For Resemble, filter to show only owned voices
+          voices = allVoices.filter(voice => voice.labels?.is_owner === true);
         }
       }
 
