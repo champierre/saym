@@ -2,7 +2,7 @@ export interface Config {
   defaultVoice?: string;
   defaultLanguage?: string;
   outputFormat?: 'mp3' | 'wav' | 'ogg';
-  ttsProvider?: 'elevenlabs' | 'cartesia' | 'xtts' | 'coefont';
+  ttsProvider?: 'elevenlabs' | 'cartesia' | 'xtts';
   providers?: {
     elevenlabs?: {
       apiKey?: string;
@@ -15,11 +15,6 @@ export interface Config {
     xtts?: {
       apiKey?: string;
       serverUrl?: string;
-      defaultVoice?: string;
-    };
-    coefont?: {
-      accessKey?: string;
-      accessSecret?: string;
       defaultVoice?: string;
     };
   };

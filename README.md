@@ -1,6 +1,6 @@
 # saym - Say iMproved
 
-A powerful text-to-speech command-line tool that extends the traditional `say` command with advanced voice synthesis capabilities using ElevenLabs, Cartesia, XTTS v2, and CoeFont APIs. Create custom voice models from your own voice and speak in multiple languages with natural-sounding output.
+A powerful text-to-speech command-line tool that extends the traditional `say` command with advanced voice synthesis capabilities using ElevenLabs, Cartesia, and XTTS v2 APIs. Create custom voice models from your own voice and speak in multiple languages with natural-sounding output.
 
 ## Live Demo (with Audio)
 
@@ -16,7 +16,7 @@ This video demonstrates saym reading its own command description using ElevenLab
 - 💬 **Simple CLI Interface**: Easy-to-use command-line interface similar to the native `say` command
 - 🔊 **Audio Output Options**: Save to file or play directly through speakers
 - 🎛️ **Voice Customization**: High-quality voice synthesis with provider-optimized settings
-- 🔄 **Multiple Providers**: Support for ElevenLabs, Cartesia, XTTS v2, and CoeFont TTS APIs
+- 🔄 **Multiple Providers**: Support for ElevenLabs, Cartesia, and XTTS v2 TTS APIs
 
 ## Installation
 
@@ -34,8 +34,6 @@ npm run build
 # Set up your API keys (at least one is required)
 export ELEVENLABS_API_KEY="your-elevenlabs-api-key"
 export CARTESIA_API_KEY="your-cartesia-api-key"
-export COEFONT_ACCESS_KEY="your-coefont-access-key"
-export COEFONT_ACCESS_SECRET="your-coefont-access-secret"
 # For XTTS v2 (optional)
 export XTTS_SERVER_URL="http://localhost:8020"  # Optional, defaults to localhost:8020
 ```
@@ -98,9 +96,6 @@ saym -p cartesia -v "12345678-abcd-efgh-ijkl-9876543210ab" "Hello from Cartesia!
 # Use XTTS v2 provider (requires XTTS server running)
 saym -p xtts -v "voice.wav" "Hello from XTTS v2!"
 
-# Use CoeFont provider (Japanese-focused TTS)
-saym -p coefont -v "coefont-id" "こんにちは、CoeFont です！"
-
 # Read from file
 saym -f input.txt
 
@@ -120,7 +115,6 @@ saym voices
 # List voices from a specific provider
 saym voices -p cartesia
 saym voices -p xtts
-saym voices -p coefont
 
 # List all public voices (including pre-made voices)
 saym voices --all
@@ -351,13 +345,12 @@ saym -p elevenlabs "Uses ElevenLabs with its default voice"
 - At least one TTS provider:
   - ElevenLabs API account and API key, OR
   - Cartesia API account and API key, OR
-  - CoeFont access key and access secret, OR
   - XTTS v2 server running locally or remotely
 - FFmpeg (for audio format conversions)
 
 ## API Key Setup
 
-You can use ElevenLabs, Cartesia, CoeFont, or XTTS v2 (or all). Here's how to set up each:
+You can use ElevenLabs, Cartesia, or XTTS v2 (or all). Here's how to set up each:
 
 ### ElevenLabs Setup
 
@@ -388,21 +381,6 @@ You can use ElevenLabs, Cartesia, CoeFont, or XTTS v2 (or all). Here's how to se
 2. Navigate to API keys section
 3. Generate and copy your API key
 
-### CoeFont Setup
-
-#### 1. Create a CoeFont Account
-
-1. Visit [CoeFont](https://coefont.cloud/) and sign up for access
-2. Create an account to get access to Japanese TTS voices
-3. CoeFont specializes in high-quality Japanese voice synthesis
-
-#### 2. Generate CoeFont API Credentials
-
-1. Log in to your CoeFont dashboard
-2. Navigate to the API settings section
-3. Generate your Access Key and Access Secret
-4. Copy both credentials (you'll need both for authentication)
-
 ### XTTS v2 Setup
 
 XTTS v2 is a self-hosted TTS system with voice cloning capabilities.
@@ -417,8 +395,6 @@ Test your API key setup:
 # Check if environment variables are set
 echo $ELEVENLABS_API_KEY
 echo $CARTESIA_API_KEY
-echo $COEFONT_ACCESS_KEY
-echo $COEFONT_ACCESS_SECRET
 echo $XTTS_SERVER_URL
 
 # Test with saym (ElevenLabs)
@@ -426,9 +402,6 @@ saym voices
 
 # Test with saym (Cartesia)
 saym voices -p cartesia
-
-# Test with saym (CoeFont)
-saym voices -p coefont
 
 # Test with saym (XTTS v2)
 saym voices -p xtts
