@@ -35,7 +35,6 @@ jobs:
       if: always()
       with:
         script: |
-          const { context } = require('@actions/github');
           const jobStatus = '${{ job.status }}';
           
           const comment = jobStatus === 'success' 
