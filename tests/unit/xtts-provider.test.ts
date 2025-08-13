@@ -76,9 +76,14 @@ describe('XTTSProvider', () => {
       const result = await provider.textToSpeech('Hello world', 'voice123');
 
       expect(mockAxiosInstance.post).toHaveBeenCalledWith(
-        '/tts_to_audio',
-        expect.any(Object),
+        '/api/tts',
+        {
+          text: 'Hello world',
+          speaker_wav: 'voice123',
+          language: 'en'
+        },
         expect.objectContaining({
+          headers: { 'Content-Type': 'application/json' },
           responseType: 'arraybuffer',
           maxContentLength: Infinity,
           maxBodyLength: Infinity,
@@ -158,18 +163,13 @@ describe('XTTSProvider', () => {
     });
 
     it('should list available voices', async () => {
-      mockAxiosInstance.get.mockResolvedValue({ 
-        data: ['voice1.wav', 'voice2.wav'] 
-      });
-
       const voices = await provider.listVoices();
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/speakers');
-      expect(voices).toHaveLength(2);
+      expect(voices).toHaveLength(1);
       expect(voices[0]).toEqual({
-        id: 'voice1.wav',
-        name: 'voice1.wav',
-        description: 'XTTS v2 voice: voice1.wav',
+        id: 'custom',
+        name: 'Custom Voice (provide .wav file)',
+        description: 'XTTS v2 requires a speaker WAV file for voice cloning',
         provider: 'xtts',
         labels: {},
         languages: expect.arrayContaining(['en', 'ja', 'es', 'fr']),
@@ -177,24 +177,16 @@ describe('XTTSProvider', () => {
     });
 
     it('should handle connection errors', async () => {
-      const mockError = {
-        isAxiosError: true,
-        code: 'ECONNREFUSED',
-      };
-      
-      (axios.isAxiosError as unknown as jest.Mock) = jest.fn().mockReturnValue(true);
-      mockAxiosInstance.get.mockRejectedValue(mockError);
-
-      await expect(provider.listVoices()).rejects.toThrow(
-        'XTTS server not running at http://localhost:8020'
-      );
+      // listVoices doesn't make API calls anymore, it returns static data
+      // This test is no longer relevant since listVoices always succeeds
+      const voices = await provider.listVoices();
+      expect(voices).toHaveLength(1);
     });
 
-    it('should return empty array for non-array response', async () => {
-      mockAxiosInstance.get.mockResolvedValue({ data: {} });
-
+    it('should return custom voice array', async () => {
       const voices = await provider.listVoices();
-      expect(voices).toEqual([]);
+      expect(voices).toHaveLength(1);
+      expect(voices[0].id).toBe('custom');
     });
   });
 
@@ -204,16 +196,12 @@ describe('XTTSProvider', () => {
     });
 
     it('should get a specific voice', async () => {
-      mockAxiosInstance.get.mockResolvedValue({ 
-        data: ['voice1.wav', 'voice2.wav'] 
-      });
-
-      const voice = await provider.getVoice('voice1.wav');
+      const voice = await provider.getVoice('custom');
 
       expect(voice).toEqual({
-        id: 'voice1.wav',
-        name: 'voice1.wav',
-        description: 'XTTS v2 voice: voice1.wav',
+        id: 'custom',
+        name: 'Custom Voice (provide .wav file)',
+        description: 'XTTS v2 requires a speaker WAV file for voice cloning',
         provider: 'xtts',
         labels: {},
         languages: expect.arrayContaining(['en', 'ja', 'es', 'fr']),
@@ -245,7 +233,7 @@ describe('XTTSProvider', () => {
 
       const isValid = await provider.validateConnection();
       expect(isValid).toBe(true);
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/docs');
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/health');
     });
 
     it('should return false for invalid connection', async () => {

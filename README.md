@@ -1,6 +1,6 @@
 # saym - Say iMproved
 
-A powerful text-to-speech command-line tool that extends the traditional `say` command with advanced voice synthesis capabilities using ElevenLabs, Cartesia, and XTTS v2 APIs. Create custom voice models from your own voice and speak in multiple languages with natural-sounding output.
+A powerful text-to-speech command-line tool that extends the traditional `say` command with advanced voice synthesis capabilities using ElevenLabs, Cartesia, XTTS v2, and Resemble AI APIs. Create custom voice models from your own voice and speak in multiple languages with natural-sounding output.
 
 ## Live Demo (with Audio)
 
@@ -16,7 +16,7 @@ This video demonstrates saym reading its own command description using ElevenLab
 - 💬 **Simple CLI Interface**: Easy-to-use command-line interface similar to the native `say` command
 - 🔊 **Audio Output Options**: Save to file or play directly through speakers
 - 🎛️ **Voice Customization**: High-quality voice synthesis with provider-optimized settings
-- 🔄 **Multiple Providers**: Support for ElevenLabs, Cartesia, and XTTS v2 TTS APIs
+- 🔄 **Multiple Providers**: Support for ElevenLabs, Cartesia, XTTS v2, and Resemble AI TTS APIs
 
 ## Installation
 
@@ -34,6 +34,7 @@ npm run build
 # Set up your API keys (at least one is required)
 export ELEVENLABS_API_KEY="your-elevenlabs-api-key"
 export CARTESIA_API_KEY="your-cartesia-api-key"
+export RESEMBLE_API_KEY="your-resemble-api-key"
 # For XTTS v2 (optional)
 export XTTS_SERVER_URL="http://localhost:8020"  # Optional, defaults to localhost:8020
 ```
@@ -96,6 +97,9 @@ saym -p cartesia -v "12345678-abcd-efgh-ijkl-9876543210ab" "Hello from Cartesia!
 # Use XTTS v2 provider (requires XTTS server running)
 saym -p xtts -v "voice.wav" "Hello from XTTS v2!"
 
+# Use Resemble AI provider (voice cloning and emotion control)
+saym -p resemble -v "voice-uuid" "Hello from Resemble AI!"
+
 # Read from file
 saym -f input.txt
 
@@ -115,6 +119,7 @@ saym voices
 # List voices from a specific provider
 saym voices -p cartesia
 saym voices -p xtts
+saym voices -p resemble
 
 # List all public voices (including pre-made voices)
 saym voices --all
@@ -345,12 +350,13 @@ saym -p elevenlabs "Uses ElevenLabs with its default voice"
 - At least one TTS provider:
   - ElevenLabs API account and API key, OR
   - Cartesia API account and API key, OR
+  - Resemble AI API account and API key, OR
   - XTTS v2 server running locally or remotely
 - FFmpeg (for audio format conversions)
 
 ## API Key Setup
 
-You can use ElevenLabs, Cartesia, or XTTS v2 (or all). Here's how to set up each:
+You can use ElevenLabs, Cartesia, Resemble AI, or XTTS v2 (or all). Here's how to set up each:
 
 ### ElevenLabs Setup
 
@@ -381,6 +387,21 @@ You can use ElevenLabs, Cartesia, or XTTS v2 (or all). Here's how to set up each
 2. Navigate to API keys section
 3. Generate and copy your API key
 
+### Resemble AI Setup
+
+#### 1. Create a Resemble AI Account
+
+1. Visit [Resemble AI](https://app.resemble.ai/) and sign up
+2. Create an account to access voice cloning and synthesis features
+3. Resemble AI offers advanced voice cloning with emotion control
+
+#### 2. Generate Resemble AI API Key
+
+1. Log in to your Resemble AI dashboard
+2. Navigate to Settings → API Keys
+3. Click "Create New API Key"
+4. Copy the generated API key
+
 ### XTTS v2 Setup
 
 XTTS v2 is a self-hosted TTS system with voice cloning capabilities.
@@ -395,6 +416,7 @@ Test your API key setup:
 # Check if environment variables are set
 echo $ELEVENLABS_API_KEY
 echo $CARTESIA_API_KEY
+echo $RESEMBLE_API_KEY
 echo $XTTS_SERVER_URL
 
 # Test with saym (ElevenLabs)
@@ -402,6 +424,9 @@ saym voices
 
 # Test with saym (Cartesia)
 saym voices -p cartesia
+
+# Test with saym (Resemble AI)
+saym voices -p resemble
 
 # Test with saym (XTTS v2)
 saym voices -p xtts
