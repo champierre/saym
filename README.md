@@ -145,12 +145,12 @@ saym -p cartesia -v "voice-id" "今日は"
 saym --format wav -o output.wav "Save as WAV file"
 
 # Configuration management
-saym config show                        # Show current configuration
+saym config                             # Show current configuration
 saym use elevenlabs                     # Switch to ElevenLabs (simple!)
 saym use cartesia                       # Switch to Cartesia (simple!)
 saym use xtts                          # Switch to XTTS v2 (simple!)
-saym default-voice <voice-id>           # Set default voice for current provider
-saym default-voice <voice-id> -p cartesia # Set default voice for specific provider
+saym voice <voice-id>           # Set default voice for current provider
+saym voice <voice-id> -p cartesia # Set default voice for specific provider
 
 # Advanced configuration (for power users)
 saym config provider elevenlabs         # Alternative way to set provider
@@ -248,12 +248,12 @@ saym voices -p cartesia --all
 
 ```bash
 # Set default voice for current provider
-saym default-voice "abc123def456ghi789"
+saym voice "abc123def456ghi789"
 
 # Or set for specific provider
-saym default-voice "12345678-abcd-efgh-ijkl-9876543210ab" -p cartesia
-saym default-voice "abc123def456ghi789" -p elevenlabs
-saym default-voice "voice.wav" -p xtts
+saym voice "12345678-abcd-efgh-ijkl-9876543210ab" -p cartesia
+saym voice "abc123def456ghi789" -p elevenlabs
+saym voice "voice.wav" -p xtts
 
 # Optional: Set global fallback voice (advanced)
 saym config set defaultVoice "some-voice-id"
@@ -277,7 +277,7 @@ saym -p elevenlabs -v "different-voice-id" "Hello with specific voice"
 
 ```bash
 # Show all current settings
-saym config show
+saym config
 
 # Show supported providers
 saym providers
@@ -294,7 +294,7 @@ saym use elevenlabs
 saym voices
 
 # 3. Set it as default
-saym default-voice "your-voice-id"
+saym voice "your-voice-id"
 
 # 4. Test
 saym "This uses my ElevenLabs default voice"
@@ -309,7 +309,7 @@ saym use cartesia
 saym voices
 
 # 3. Set it as default
-saym default-voice "your-voice-id"
+saym voice "your-voice-id"
 
 # 4. Test
 saym "This uses my Cartesia default voice"
@@ -324,7 +324,7 @@ saym use xtts
 saym voices
 
 # 3. Set your voice file as default
-saym default-voice "voice.wav"
+saym voice "voice.wav"
 
 # 4. Test
 saym "This uses my XTTS v2 voice"
@@ -336,8 +336,8 @@ saym "This uses my XTTS v2 voice"
 saym use cartesia
 
 # Set default voices for both providers  
-saym default-voice "cartesia-voice-id"              # For current (cartesia)
-saym default-voice "elevenlabs-voice-id" -p elevenlabs  # For elevenlabs
+saym voice "cartesia-voice-id"              # For current (cartesia)
+saym voice "elevenlabs-voice-id" -p elevenlabs  # For elevenlabs
 
 # Now you can easily switch:
 saym "Uses Cartesia (default provider)"

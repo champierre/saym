@@ -221,13 +221,108 @@ program
 // Configuration commands
 const configCommand = program.command('config').description('Configuration management');
 
+// Default action for config command (when no subcommand is provided)
+configCommand.action(() => {
+  const allConfig = config.getAll();
+  console.log('Current configuration:');
+  console.log(JSON.stringify(allConfig, null, 2));
+});
+
 configCommand
-  .command('show')
-  .description('Show current configuration')
+  .command('set <key> <value>')
+  .description('Set configuration value')
+  .action((key, value) => {
+    try {
+      // Handle special cases for nested properties
+      if (key === 'ttsProvider' && !['elevenlabs', 'cartesia', 'xtts'].includes(value)) {
+        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia, xtts');
+        process.exit(1);
+      }
+      
+      // Handle provider-specific default voice setting
+      if (key.includes('DefaultVoice')) {
+        const match = key.match(/^(elevenlabs|cartesia|xtts)DefaultVoice$/);
+        if (match) {
+          const provider = match[1] as 'elevenlabs' | 'cartesia' | 'xtts';
+          config.setProviderDefaultVoice(provider, value);
+          console.log(`Configuration updated: ${provider} default voice = ${value}`);
+          return;
+        }
+      }
+      
+      config.set(key as any, value);
+      console.log(`Configuration updated: ${key} = ${value}`);
+    } catch (error) {
+      console.error('Error:', error);
+      process.exit(1);
+    }
+  });
+
+// Simplified commands for common operations
+configCommand
+  .command('provider <provider>')
+  .description('Set default TTS provider (elevenlabs|cartesia|xtts|resemble)')
+  .action((provider) => {
+    try {
+      if (!['elevenlabs', 'cartesia', 'xtts', 'resemble'].includes(provider)) {
+        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia, xtts, resemble');
+        process.exit(1);
+      }
+      
+      config.set('ttsProvider' as any, provider);
+      console.log(`Default provider set to: ${provider}`);
+    } catch (error) {
+      console.error('Error:', error);
+      process.exit(1);
+    }
+  });
+
+configCommand
+  .command('voice <voice-id>')
+  .description('Set default voice for current provider')
+  .option('-p, --provider <provider>', 'Set voice for specific provider (elevenlabs|cartesia|xtts|resemble)')
+  .action((voiceId, options) => {
+    try {
+      const provider = options.provider || config.get('ttsProvider') || 'elevenlabs';
+      
+      if (options.provider && !['elevenlabs', 'cartesia', 'xtts', 'resemble'].includes(options.provider)) {
+        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia, xtts, resemble');
+        process.exit(1);
+      }
+      
+      config.setProviderDefaultVoice(provider as 'elevenlabs' | 'cartesia' | 'xtts' | 'resemble', voiceId);
+      console.log(`Default voice for ${provider} set to: ${voiceId}`);
+    } catch (error) {
+      console.error('Error:', error);
+      process.exit(1);
+    }
+  });
+
+// Keep the original detailed command for advanced users
+configCommand
+  .command('set-default-voice <provider> <voice-id>')
+  .description('Set default voice for a specific provider (elevenlabs|cartesia|xtts|resemble)')
+  .action((provider, voiceId) => {
+    try {
+      if (!['elevenlabs', 'cartesia', 'xtts', 'resemble'].includes(provider)) {
+        console.error('Error: Invalid provider. Choose from: elevenlabs, cartesia, xtts, resemble');
+        process.exit(1);
+      }
+      
+      config.setProviderDefaultVoice(provider as 'elevenlabs' | 'cartesia' | 'xtts' | 'resemble', voiceId);
+      console.log(`Default voice for ${provider} set to: ${voiceId}`);
+    } catch (error) {
+      console.error('Error:', error);
+      process.exit(1);
+    }
+  });
+
+configCommand
+  .command('reset')
+  .description('Reset configuration to defaults')
   .action(() => {
-    const allConfig = config.getAll();
-    console.log('Current configuration:');
-    console.log(JSON.stringify(allConfig, null, 2));
+    config.reset();
+    console.log('Configuration reset to defaults.');
   });
 
 configCommand
@@ -373,7 +468,7 @@ program
       if (defaultVoice) {
         console.log(`Default voice for ${provider}: ${defaultVoice}`);
       } else {
-        console.log(`No default voice set for ${provider}. Use 'saym default-voice <voice-id>' to set one.`);
+        console.log(`No default voice set for ${provider}. Use 'saym voice <voice-id>' to set one.`);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -382,7 +477,7 @@ program
   });
 
 program
-  .command('default-voice <voice-id>')
+  .command('voice <voice-id>')
   .description('Set default voice for current provider')
   .option('-p, --provider <provider>', 'Set for specific provider')
   .action((voiceId, options) => {
