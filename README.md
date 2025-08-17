@@ -1,5 +1,8 @@
 # saym - Say iMproved
 
+[![npm version](https://badge.fury.io/js/saym.svg)](https://www.npmjs.com/package/saym)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A powerful text-to-speech command-line tool that extends the traditional `say` command with advanced voice synthesis capabilities using multiple AI-powered TTS providers. Create custom voice models from your own voice and speak in multiple languages with natural-sounding output.
 
 ## Live Demo (with Audio)
@@ -20,6 +23,32 @@ This video demonstrates saym reading its own command description using ElevenLab
 
 ## Installation
 
+### Quick Start with npx (No Installation Required)
+
+```bash
+# Use directly with npx
+npx saym "Hello world"
+
+# Set up your API key first (at least one is required)
+export ELEVENLABS_API_KEY="your-api-key"
+# or
+export CARTESIA_API_KEY="your-api-key"
+# or
+export RESEMBLE_API_KEY="your-api-key"
+```
+
+### Global Installation
+
+```bash
+# Install globally via npm
+npm install -g saym
+
+# Now use the saym command directly
+saym "Hello world"
+```
+
+### Local Development
+
 ```bash
 # Clone the repository
 git clone https://github.com/yourusername/saym.git
@@ -39,51 +68,14 @@ export RESEMBLE_API_KEY="your-resemble-api-key"
 export XTTS_SERVER_URL="http://localhost:8020"  # Optional, defaults to localhost:8020
 ```
 
-### Running saym
-
-#### Option 1: Use npm/node directly (Recommended for development)
-
-```bash
-# Run with npm
-npm run dev "Hello world"
-
-# Or run the built version
-node dist/cli.js "Hello world"
-```
-
-#### Option 2: Install globally
-
-```bash
-# Install globally
-npm install -g .
-
-# Now you can use saym command
-saym "Hello world"
-```
-
-#### Option 3: Create an alias
-
-```bash
-# Add to your ~/.zshrc or ~/.bashrc
-alias saym="node /path/to/saym/dist/cli.js"
-
-# Reload shell configuration
-source ~/.zshrc
-
-# Now you can use
-saym "Hello world"
-```
 
 ## Usage
 
 ### Basic Usage
 
-Note: Replace `saym` with `node dist/cli.js` if you haven't installed globally.
-
 ```bash
 # Speak text using default voice
 saym "Hello, world!"
-# Or: node dist/cli.js "Hello, world!"
 
 # Use a specific voice model by ID or name
 saym -v "voice-id-or-name" "This is my custom voice"
