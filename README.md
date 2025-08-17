@@ -29,6 +29,12 @@ This video demonstrates saym reading its own command description using ElevenLab
 # Use directly with npx
 npx saym "Hello world"
 
+# Always use the latest version
+npx saym@latest "Hello world"
+
+# Use without downloading (requires cache)
+npx --no-install saym "Hello world"
+
 # Set up your API key first (at least one is required)
 export ELEVENLABS_API_KEY="your-api-key"
 # or
@@ -36,6 +42,13 @@ export CARTESIA_API_KEY="your-api-key"
 # or
 export RESEMBLE_API_KEY="your-api-key"
 ```
+
+#### Understanding npx behavior
+
+- **First run**: Downloads the package and caches it
+- **Subsequent runs**: Uses cached version (fast)
+- **`@latest`**: Always checks for and uses the latest version
+- **`--no-install`**: Only runs if already in cache (no download)
 
 ### Global Installation
 
