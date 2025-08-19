@@ -1,6 +1,7 @@
 # saym - Say iMproved
 
 [![npm version](https://badge.fury.io/js/saym.svg)](https://www.npmjs.com/package/saym)
+[![GitHub Release](https://img.shields.io/github/v/release/champierre/saym)](https://github.com/champierre/saym/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A powerful text-to-speech command-line tool that extends the traditional `say` command with advanced voice synthesis capabilities using multiple AI-powered TTS providers. Create custom voice models from your own voice and speak in multiple languages with natural-sounding output.
@@ -436,6 +437,12 @@ saym voices -p resemble
 # Test with saym (XTTS v2)
 saym voices -p xtts
 ```
+
+## Releases
+
+View the [latest release notes](https://github.com/champierre/saym/releases/latest) for detailed information about recent updates and changes.
+
+See all releases: [GitHub Releases](https://github.com/champierre/saym/releases)
 
 ## License
 

@@ -1,6 +1,6 @@
 {
   "name": "saym",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Say iMproved - Advanced text-to-speech CLI with custom voice models",
   "main": "dist/cli.js",
   "bin": {
