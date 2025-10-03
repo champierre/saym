@@ -9,6 +9,7 @@ export interface TTSOptions {
   outputFormat?: string;
   modelId?: string;
   language?: string;
+  voiceDescription?: string;
 }
 
 export interface TTSVoice {
