@@ -96,7 +96,7 @@ export class ConfigManager {
   /**
    * Get API key from environment or config
    */
-  getApiKey(provider?: 'elevenlabs' | 'cartesia' | 'xtts' | 'resemble'): string | undefined {
+  getApiKey(provider?: 'elevenlabs' | 'cartesia' | 'xtts' | 'resemble' | 'hume'): string | undefined {
     const ttsProvider = provider || this.config.ttsProvider || 'elevenlabs';
     
     switch (ttsProvider) {
@@ -108,6 +108,8 @@ export class ConfigManager {
         return process.env.XTTS_API_KEY || this.config.providers?.xtts?.apiKey || 'none';
       case 'resemble':
         return process.env.RESEMBLE_API_KEY || this.config.providers?.resemble?.apiKey;
+      case 'hume':
+        return process.env.HUME_API_KEY || this.config.providers?.hume?.apiKey;
       default:
         return undefined;
     }
@@ -116,7 +118,7 @@ export class ConfigManager {
   /**
    * Get default voice for a specific provider
    */
-  getDefaultVoice(provider?: 'elevenlabs' | 'cartesia' | 'xtts' | 'resemble'): string | undefined {
+  getDefaultVoice(provider?: 'elevenlabs' | 'cartesia' | 'xtts' | 'resemble' | 'hume'): string | undefined {
     const ttsProvider = provider || this.config.ttsProvider || 'elevenlabs';
     
     // First check provider-specific default voice
@@ -141,8 +143,13 @@ export class ConfigManager {
           return this.config.providers.resemble.defaultVoice;
         }
         break;
+      case 'hume':
+        if (this.config.providers?.hume?.defaultVoice) {
+          return this.config.providers.hume.defaultVoice;
+        }
+        break;
     }
-    
+
     // Fallback to global default voice
     return this.config.defaultVoice;
   }
@@ -150,7 +157,7 @@ export class ConfigManager {
   /**
    * Set default voice for a specific provider
    */
-  setProviderDefaultVoice(provider: 'elevenlabs' | 'cartesia' | 'xtts' | 'resemble', voiceId: string): void {
+  setProviderDefaultVoice(provider: 'elevenlabs' | 'cartesia' | 'xtts' | 'resemble' | 'hume', voiceId: string): void {
     if (!this.config.providers) {
       this.config.providers = {};
     }
